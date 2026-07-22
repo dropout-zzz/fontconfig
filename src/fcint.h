@@ -56,6 +56,10 @@
 #include <sys/types.h>
 #include <time.h>
 
+#ifdef HAVE_XLOCALE_H
+#include <xlocale.h>
+#endif
+
 #include "fcatomic.h"
 #include "fcdeprecate.h"
 #include "fcmutex.h"
