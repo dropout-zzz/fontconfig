@@ -153,7 +153,6 @@ def main():
     parser.add_argument(
         "-o",
         "--output",
-        type=argparse.FileType("w", encoding="utf-8"),
         default=sys.stdout,
         help="Output file (default: stdout)",
     )
@@ -177,10 +176,15 @@ def main():
         )
         sys.exit(1)
 
+    if args.output == '-':
+        output = sys.stdout
+    else:
+        output = open(args.output, 'w', encoding="utf-8")
+
     # Generate output
-    with args.output:
-        args.output.write(gen_header())
-        args.output.write(gen_gperf_code(family_map))
+    with output:
+        output.write(gen_header())
+        output.write(gen_gperf_code(family_map))
 
     return 0
 

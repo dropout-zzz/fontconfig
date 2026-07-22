@@ -155,7 +155,6 @@ def main():
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
     )
     parser.add_argument('-o', '--output',
-                        type=argparse.FileType('w'),
                         default='-',
                         help='Output file')
     parser.add_argument('-t', '--test',
@@ -167,12 +166,18 @@ def main():
                         help='fcobjs.h file')
 
     args = parser.parse_args()
-    with args.output:
-        args.output.write(gen_header())
+
+    if args.output == '-':
+        output = sys.stdout
+    else:
+        output = open(args.output, 'w')
+
+    with output:
+        output.write(gen_header())
         if args.test:
-            args.output.write(gen_test_body(args.list, args.header))
+            output.write(gen_test_body(args.list, args.header))
         else:
-            args.output.write(gen_body(args.list, args.header))
+            output.write(gen_body(args.list, args.header))
 
     sys.exit(0)
 
