@@ -2,6 +2,7 @@
 # fontconfig/fc-lang/su.orth
 #
 # Copyright © 2009 Roozbeh Pournader
+# Copyright © 2026 fontconfig Authors
 #
 # Permission to use, copy, modify, distribute, and sell this software and its
 # documentation for any purpose is hereby granted without fee, provided that
@@ -23,11 +24,7 @@
 #
 # Sundanese (su)
 #
-# Sources:
-# * http://en.wikipedia.org/wiki/Sundanese_language
-# * http://www.omniglot.com/writing/sundanese.php
+# https://en.wikipedia.org/wiki/Sundanese_script
 #
-0041-005A
-0061-007A
-00C9
-00E9
+1b80-1bbf
+1cc0-1cc7
