@@ -318,7 +318,8 @@ ORTH = \
 	yuw.orth \
 	got.orth \
 	cop.orth \
-	suz.orth
+	suz.orth \
+	ban.orth
 #	^-------------- Add new orth files here
 
 BUILT_SOURCES += $(top_builddir)/conf.d/35-lang-normalize.conf

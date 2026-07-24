@@ -282,11 +282,22 @@ orth_files = [
   'got.orth',
   'cop.orth',
   'suz.orth',
+  'ban.orth',
 ]
 
-fclang_h = custom_target('fclang.h',
+fclang_h = custom_target(
+  'fclang.h',
   output: ['fclang.h'],
   input: orth_files,
-  command: [find_program('fc-lang.py'), orth_files, '--template', files('fclang.tmpl.h')[0], '--output', '@OUTPUT@', '--directory', meson.current_source_dir()],
+  command: [
+    find_program('fc-lang.py'),
+    orth_files,
+    '--template',
+    files('fclang.tmpl.h')[0],
+    '--output',
+    '@OUTPUT@',
+    '--directory',
+    meson.current_source_dir(),
+  ],
   build_by_default: true,
 )
