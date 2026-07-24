@@ -333,6 +333,9 @@ orth_files = [
   'pgd.orth',
   'pgl.orth',
   'xzh.orth',
+  'akk.orth',
+  'sux.orth',
+  'hit.orth',
 ]
 
 fclang_h = custom_target(
