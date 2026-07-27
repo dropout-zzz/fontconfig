@@ -318,7 +318,61 @@ ORTH = \
 	yuw.orth \
 	got.orth \
 	cop.orth \
-	suz.orth
+	suz.orth \
+	ban.orth \
+	bax.orth \
+	ae.orth \
+	aho.orth \
+	arc.orth \
+	bku.orth \
+	blt.orth \
+	ccp.orth \
+	cjm.orth \
+	dmf.orth \
+	egy.orth \
+	eky.orth \
+	gmy.orth \
+	hmd.orth \
+	hnn.orth \
+	hoc.orth \
+	khb.orth \
+	lep.orth \
+	lif.orth \
+	lis.orth \
+	mid.orth \
+	mro.orth \
+	nnp.orth \
+	osa.orth \
+	otk.orth \
+	oui.orth \
+	pal.orth \
+	peo.orth \
+	phn.orth \
+	rhg.orth \
+	sam.orth \
+	sog.orth \
+	tbw.orth \
+	tdd.orth \
+	txg.orth \
+	uga.orth \
+	vai.orth \
+	xag.orth \
+	xco.orth \
+	xcr.orth \
+	xlc.orth \
+	xld.orth \
+	xmr.orth \
+	xpr.orth \
+	xsa.orth \
+	zkt.orth \
+	ett.orth \
+	kaw.orth \
+	pgd.orth \
+	pgl.orth \
+	xzh.orth \
+	akk.orth \
+	sux.orth \
+	hit.orth
 #	^-------------- Add new orth files here
 
 BUILT_SOURCES += $(top_builddir)/conf.d/35-lang-normalize.conf
