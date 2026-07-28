@@ -372,7 +372,10 @@ ORTH = \
 	xzh.orth \
 	akk.orth \
 	sux.orth \
-	hit.orth
+	hit.orth \
+	xna.orth \
+	hlu.orth \
+	ecy.orth
 #	^-------------- Add new orth files here
 
 BUILT_SOURCES += $(top_builddir)/conf.d/35-lang-normalize.conf
