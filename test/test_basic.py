@@ -337,5 +337,6 @@ def test_xdg_cache_home(fctest, fcfont):
     phome = Path(new_home.name)
     assert (phome / '.cache').exists()
     assert (phome / '.cache' / 'fontconfig').exists()
-    cache_files = [f.name for f in (phome / '.cache' / 'fontconfig').glob('*cache*')]
+    cache_files = [f.name for f in (phome / '.cache' / 'fontconfig').glob('*cache*')
+                   if not f.is_symlink()]
     assert len(cache_files) == 1

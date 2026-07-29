@@ -59,7 +59,10 @@ class Build:
     def __init__(self, args):
         self.args = args
         self.cidir = pathlib.Path(__file__).parent
-        self.srcdir = pathlib.Path.cwd()
+        if args.source_dir:
+            self.srcdir = pathlib.Path(args.source_dir).resolve()
+        else:
+            self.srcdir = pathlib.Path.cwd()
         self.task = None
         self.config = {}
 
@@ -378,15 +381,18 @@ class BuildMeson(Build):
         if not self.args.no_clean:
             self._clean_paths(self.builddir, self.prefix)
 
-        self._run_command([
+        setup_args = [
             "meson", "setup",
             f"--prefix={self.prefix}",
             f"-D{self.subprojectname}nls=enabled",
             f"-D{self.subprojectname}cache-build=disabled",
             f"-D{self.subprojectname}iconv=enabled",
             *self.buildopt,
-            str(self.builddir)
-        ], "meson setup")
+            str(self.builddir),
+        ]
+        if self.srcdir != pathlib.Path.cwd():
+            setup_args.append(str(self.srcdir))
+        self._run_command(setup_args, "meson setup")
 
     def compile(self):
         self._run_command(self._meson_cmd("compile", "-v"), "meson compile")
@@ -540,6 +546,8 @@ Environment variables:
                        help="Build type: shared, static, or both")
     parser.add_argument("-X", "--xmlbackend", choices=["expat", "libxml2"], default="expat",
                        help="XML parser library to use")
+    parser.add_argument("--source-dir",
+                       help="Source directory to build (default: current directory)")
 
     args = parser.parse_args()
 
