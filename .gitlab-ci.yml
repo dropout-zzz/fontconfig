@@ -48,10 +48,10 @@ variables:
 # changing these will force rebuilding the associated image
 # Note: these tags have no meaning and are not tied to a particular
 # fontconfig version
-  ALPINE_TAG:    '2026-04-28.1-e12b3c4d8188'
-  FEDORA_TAG:    '2026-04-28.1-28519943094a'
-  FREEBSD_TAG:   '2026-04-28.1-ab85c3d043ae'
-  MSYS2_TAG:     '2026-04-28.1-1abda8f998e7'
+  ALPINE_TAG:    '2026-07-29.0-271373fb3186'
+  FEDORA_TAG:    '2026-07-29.0-931c43184912'
+  FREEBSD_TAG:   '2026-07-29.0-79e636a004d9'
+  MSYS2_TAG:     '2026-07-29.0-7fb34bd25ffe'
 
   ALPINE_EXEC:   'bash .gitlab-ci/alpine-install.sh'
   FEDORA_EXEC:   'bash .gitlab-ci/fedora-install.sh'
@@ -117,7 +117,7 @@ fedora:rawhide@container-prep:
   variables:
     GIT_STRATEGY: none
     FDO_DISTRIBUTION_VERSION: 'rawhide'
-    FDO_DISTRIBUTION_PACKAGES: '@buildsys-build autoconf automake clang-devel clang-tools-extra curl libtool gettext gettext-devel gperf expat-devel libxml2-devel freetype-devel json-c-devel git git-clang-format docbook-utils docbook-utils-pdf bubblewrap ninja-build wget python3-pip rust cargo bindgen-cli libasan libubsan libabigail'
+    FDO_DISTRIBUTION_PACKAGES: '@buildsys-build autoconf automake clang-devel clang-tools-extra curl libtool gettext gettext-devel gperf expat-devel libxml2-devel freetype-devel json-c-devel git git-clang-format docbook-utils wkhtmltopdf bubblewrap ninja-build wget python3-pip rust cargo bindgen-cli libasan libubsan libabigail'
     FDO_DISTRIBUTION_TAG: $FEDORA_TAG
     FDO_DISTRIBUTION_EXEC: $FEDORA_EXEC
 
@@ -127,7 +127,7 @@ fedora:44@container-prep:
   variables:
     GIT_STRATEGY: none
     FDO_DISTRIBUTION_VERSION: '44'
-    FDO_DISTRIBUTION_PACKAGES: '@buildsys-build autoconf automake clang-devel clang-tools-extra curl libtool gettext gettext-devel gperf expat-devel libxml2-devel freetype-devel json-c-devel git git-clang-format docbook-utils docbook-utils-pdf bubblewrap ninja-build wget python3-pip rust cargo bindgen-cli libasan libubsan libabigail'
+    FDO_DISTRIBUTION_PACKAGES: '@buildsys-build autoconf automake clang-devel clang-tools-extra curl libtool gettext gettext-devel gperf expat-devel libxml2-devel freetype-devel json-c-devel git git-clang-format docbook-utils wkhtmltopdf bubblewrap ninja-build wget python3-pip rust cargo bindgen-cli libasan libubsan libabigail'
     FDO_DISTRIBUTION_TAG: $FEDORA_TAG
     FDO_DISTRIBUTION_EXEC: $FEDORA_EXEC
 
@@ -137,7 +137,7 @@ fedora:43@container-prep:
   variables:
     GIT_STRATEGY: none
     FDO_DISTRIBUTION_VERSION: '43'
-    FDO_DISTRIBUTION_PACKAGES: '@buildsys-build autoconf automake clang-devel clang-tools-extra curl libtool gettext gettext-devel gperf expat-devel libxml2-devel freetype-devel json-c-devel git git-clang-format docbook-utils docbook-utils-pdf bubblewrap ninja-build wget python3-pip rust cargo bindgen-cli libasan libubsan libabigail'
+    FDO_DISTRIBUTION_PACKAGES: '@buildsys-build autoconf automake clang-devel clang-tools-extra curl libtool gettext gettext-devel gperf expat-devel libxml2-devel freetype-devel json-c-devel git git-clang-format docbook-utils wkhtmltopdf bubblewrap ninja-build wget python3-pip rust cargo bindgen-cli libasan libubsan libabigail'
     FDO_DISTRIBUTION_TAG: $FEDORA_TAG
     FDO_DISTRIBUTION_EXEC: $FEDORA_EXEC
 
@@ -149,7 +149,7 @@ freebsd:14.3@container-prep:
   variables:
     GIT_STRATEGY: none
     FDO_DISTRIBUTION_VERSION: '14.3'
-    FDO_DISTRIBUTION_PACKAGES: 'gcc gettext gperf expat libxml2 freetype2 json-c git wget python3 py311-pip pkgconf gmake gettext-runtime ninja'
+    FDO_DISTRIBUTION_PACKAGES: 'gcc gettext gperf expat libxml2 freetype2 json-c git wget python3 py312-pip pkgconf gmake gettext-runtime ninja'
     FDO_DISTRIBUTION_TAG: $FREEBSD_TAG
     FDO_DISTRIBUTION_EXEC: $FREEBSD_EXEC
 
@@ -433,6 +433,7 @@ build-autotools shared expat:
     FC_BUILDSYS: autotools
     FC_BUILD_TYPE: shared
     FC_XML_BACKEND: expat
+    FC_BUILD_DISABLED: docs
   needs:
     - fedora:rawhide@container-prep
 build-autotools shared libxml2:
@@ -448,6 +449,7 @@ build-autotools shared libxml2:
     FC_BUILDSYS: autotools
     FC_BUILD_TYPE: shared
     FC_XML_BACKEND: libxml2
+    FC_BUILD_DISABLED: docs
   needs:
     - fedora:rawhide@container-prep
 build-autotools static expat:
@@ -463,6 +465,7 @@ build-autotools static expat:
     FC_BUILDSYS: autotools
     FC_BUILD_TYPE: static
     FC_XML_BACKEND: expat
+    FC_BUILD_DISABLED: docs
   needs:
     - fedora:rawhide@container-prep
 build-autotools static libxml2:
@@ -478,6 +481,7 @@ build-autotools static libxml2:
     FC_BUILDSYS: autotools
     FC_BUILD_TYPE: static
     FC_XML_BACKEND: libxml2
+    FC_BUILD_DISABLED: docs
   needs:
     - fedora:rawhide@container-prep
 build-meson shared expat:
