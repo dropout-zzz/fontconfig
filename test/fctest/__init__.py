@@ -359,7 +359,8 @@ class FcTest:
 
     def cache_files(self) -> Iterator[Path]:
         for c in Path(self.cachedir.name).glob("*cache*"):
-            yield c
+            if not c.is_symlink():
+                yield c
 
     def convert_path(self, path) -> str:
         winpath = PureWindowsPath(path)

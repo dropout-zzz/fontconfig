@@ -67,6 +67,10 @@ test_patterns:
       FC_BUILDSYS: meson
       FC_BUILD_TYPE: shared
       FC_BUILD_ASAN: address,undefined
+  - name: "cache-compat"
+    parent: "meson shared expat"
+    variables:
+      FC_BASELINE_TAG: ""
 
 distributions:
   - name: alpine

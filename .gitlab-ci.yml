@@ -48,10 +48,10 @@ variables:
 # changing these will force rebuilding the associated image
 # Note: these tags have no meaning and are not tied to a particular
 # fontconfig version
-  ALPINE_TAG:    '2026-04-28.1-d08dbd516dda'
-  FEDORA_TAG:    '2026-04-28.1-89961c528f40'
-  FREEBSD_TAG:   '2026-04-28.1-9e697a941122'
-  MSYS2_TAG:     '2026-04-28.1-85b55ab0f3e3'
+  ALPINE_TAG:    '2026-04-28.1-e12b3c4d8188'
+  FEDORA_TAG:    '2026-04-28.1-28519943094a'
+  FREEBSD_TAG:   '2026-04-28.1-ab85c3d043ae'
+  MSYS2_TAG:     '2026-04-28.1-1abda8f998e7'
 
   ALPINE_EXEC:   'bash .gitlab-ci/alpine-install.sh'
   FEDORA_EXEC:   'bash .gitlab-ci/fedora-install.sh'
@@ -398,6 +398,7 @@ msys2:latest@container-clean:
       - build*/fontconfig/fontconfig.h
       - build*/libfontconfig.so*
       - build*/src/.libs/libfontconfig.so*
+      - build*/fc-*/fc-*
       - prefix*
     reports:
       junit: build*/meson-logs/testlog.junit.xml
@@ -667,6 +668,21 @@ ASAN/UBSAN:
     FC_BUILD_ASAN: address,undefined
   needs:
     - fedora:rawhide@container-prep
+cache-compat:
+  stage: test
+  extends:
+    - .test_hook@template
+    - .fdo.distribution-image@fedora
+    - .fc_artifacts
+  variables:
+    FC_DISTRO_NAME: fedora
+    FDO_DISTRIBUTION_VERSION: rawhide
+    FDO_DISTRIBUTION_TAG: $FEDORA_TAG
+    FC_TEST_EXEC: cache-compat
+    FC_BASELINE_TAG: 
+  needs:
+    - fedora:rawhide@container-prep
+    - build-meson shared expat
 
 abicheck:
   stage: test

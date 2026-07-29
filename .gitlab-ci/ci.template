@@ -315,6 +315,7 @@ check-ci-script:
       - build*/fontconfig/fontconfig.h
       - build*/libfontconfig.so*
       - build*/src/.libs/libfontconfig.so*
+      - build*/fc-*/fc-*
       - prefix*
     reports:
       junit: build*/meson-logs/testlog.junit.xml

@@ -43,12 +43,15 @@ eval `echo $version |
 cachever=$(grep -e "^cacheversion" meson.build | sed -E "s/cacheversion\s*=\s*([0-9]*)/\1/")
 cachesnap=$(grep -e "^cachesnapversion" meson.build | sed -E "s/cachesnapversion\s*=\s*([0-9]*)/\1/")
 if [ "$cachesnap" -gt 0 ]; then
+    oldcachever=$cachever
     ((cachever++))
     cachesnap=0
-    # Update cache version
-    sed -i configure.ac -e "/^CACHE_VERSION/s/[0-9]\+/$cachever/" \
+    # Update cache version and reset min compat to previous version
+    sed -i configure.ac -e "/^CACHE_VERSION=/s/[0-9]\+/$cachever/" \
+        -e "/^CACHE_MIN_COMPAT_VERSION/s/[0-9]\+/$oldcachever/" \
         -e "/^CACHE_SNAP_VERSION/s/[0-9]\+/$cachesnap/"
     sed -i meson.build -e "/^cacheversion/s/[0-9]\+/$cachever/" \
+        -e "/^cachemincompat/s/[0-9]\+/$oldcachever/" \
         -e "/^cachesnapversion/s/[0-9]\+/$cachesnap/"
 fi
 
