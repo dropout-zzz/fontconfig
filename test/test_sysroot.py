@@ -37,10 +37,12 @@ def test_sysroot(fctest, fcfont):
         assert ret == 0, stderr
     font_files = [fn.name for fn in fontdir.glob('*.pcf')]
     assert len(font_files) == 1, font_files
-    cache_files = [c.name for c in cachedir.glob('*cache*')]
+    cache_files = [c.name for c in cachedir.glob('*cache*')
+                   if not c.is_symlink()]
     assert len(cache_files) == 1, cache_files
 
     md5 = hashlib.md5()
     md5.update(fctest.fontdir.name.encode('utf-8'))
-    cache_files_based_on_md5 = [c.name for c in cachedir.glob(f'{md5.hexdigest()}*')]
+    cache_files_based_on_md5 = [c.name for c in cachedir.glob(f'{md5.hexdigest()}*')
+                                if not c.is_symlink()]
     assert len(cache_files_based_on_md5) == 1, cache_files_based_on_md5

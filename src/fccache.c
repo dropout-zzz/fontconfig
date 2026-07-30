@@ -114,6 +114,22 @@ bail:
 
 #define CACHEBASE_LEN (1 + 36 + 1 + sizeof (FC_ARCHITECTURE) + sizeof (FC_CACHE_SUFFIX))
 
+static FcChar8 *
+FcDirCacheReplaceVersion (const FcChar8 *cache_base,
+			  FcChar8 compat_base[CACHEBASE_LEN],
+			  int version)
+{
+    const char *suffix = strstr ((const char *)cache_base, ".cache-");
+    size_t	prefix_len;
+
+    if (!suffix)
+	return NULL;
+    prefix_len = suffix - (const char *)cache_base;
+    memcpy (compat_base, cache_base, prefix_len);
+    sprintf ((char *)compat_base + prefix_len, ".cache-%d", version);
+    return compat_base;
+}
+
 static FcBool
 FcCacheIsMmapSafe (int fd)
 {
@@ -1467,9 +1483,10 @@ FcDirCacheWrite (FcCache *cache, FcConfig *config)
 
     FcDirCacheBasenameMD5 (config, dir, cache_base);
     cache_hashed = FcStrBuildFilename (cache_dir, cache_base, NULL);
-    FcStrFree (cache_dir);
-    if (!cache_hashed)
+    if (!cache_hashed) {
+	FcStrFree (cache_dir);
 	return FcFalse;
+    }
 
     if (FcDebug() & FC_DBG_CACHE)
 	printf ("FcDirCacheWriteDir dir \"%s\" file \"%s\"\n",
@@ -1528,6 +1545,31 @@ FcDirCacheWrite (FcCache *cache, FcConfig *config)
 	unlock_cache();
     }
 
+#ifdef HAVE_SYMLINK
+    if (FC_CACHE_MIN_COMPAT_VERSION < FC_CACHE_VERSION_NUMBER) {
+	int v;
+
+	for (v = FC_CACHE_MIN_COMPAT_VERSION; v < FC_CACHE_VERSION_NUMBER; v++) {
+	    FcChar8  compat_base[CACHEBASE_LEN];
+	    FcChar8 *compat_path;
+
+	    if (!FcDirCacheReplaceVersion (cache_base, compat_base, v))
+		continue;
+	    compat_path = FcStrBuildFilename (cache_dir, compat_base, NULL);
+	    if (!compat_path)
+		continue;
+	    (void)unlink ((char *)compat_path);
+	    if (symlink ((char *)cache_base, (char *)compat_path) < 0) {
+		if (FcDebug() & FC_DBG_CACHE)
+		    printf ("FcDirCacheWrite: symlink %s -> %s failed\n",
+			    compat_path, cache_base);
+	    }
+	    FcStrFree (compat_path);
+	}
+    }
+#endif
+
+    FcStrFree (cache_dir);
     FcStrFree (cache_hashed);
     FcAtomicUnlock (atomic);
     FcAtomicDestroy (atomic);
@@ -1540,8 +1582,29 @@ bail4:
 bail3:
     FcAtomicDestroy (atomic);
 bail1:
+    FcStrFree (cache_dir);
     FcStrFree (cache_hashed);
     return FcFalse;
+}
+
+static int
+FcCacheFileVersion (const char *name)
+{
+    const char *arch_suffix = "-" FC_ARCHITECTURE ".cache-";
+    size_t	arch_suffix_len = strlen (arch_suffix);
+    const char *version_str;
+    char       *end;
+    long	version;
+
+    if (strlen (name) < 32 + arch_suffix_len + 1)
+	return -1;
+    if (strncmp (name + 32, arch_suffix, arch_suffix_len) != 0)
+	return -1;
+    version_str = name + 32 + arch_suffix_len;
+    version = strtol (version_str, &end, 10);
+    if (*end != '\0' || version <= 0)
+	return -1;
+    return (int)version;
 }
 
 FcBool
@@ -1588,13 +1651,13 @@ FcDirCacheClean (const FcChar8 *cache_dir, FcBool verbose)
     while ((ent = readdir (d))) {
 	FcChar8       *file_name;
 	const FcChar8 *target_dir;
+	int            file_version;
 
 	if (ent->d_name[0] == '.')
 	    continue;
-	/* skip cache files for different architectures and */
-	/* files which are not cache files at all */
-	if (strlen (ent->d_name) != 32 + strlen ("-" FC_ARCHITECTURE FC_CACHE_SUFFIX) ||
-	    strcmp (ent->d_name + 32, "-" FC_ARCHITECTURE FC_CACHE_SUFFIX))
+	file_version = FcCacheFileVersion (ent->d_name);
+	if (file_version < FC_CACHE_MIN_COMPAT_VERSION ||
+	    file_version > FC_CACHE_VERSION_NUMBER)
 	    continue;
 
 	file_name = FcStrBuildFilename (dir, (FcChar8 *)ent->d_name, NULL);

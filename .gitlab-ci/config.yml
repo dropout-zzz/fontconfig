@@ -1,4 +1,4 @@
-.default_tag: &default_tag "2026-04-28.1"
+.default_tag: &default_tag "2026-07-29.0"
 
 build_patterns:
   - name: "autotools shared expat"
@@ -6,21 +6,25 @@ build_patterns:
       FC_BUILDSYS: autotools
       FC_BUILD_TYPE: shared
       FC_XML_BACKEND: expat
+      FC_BUILD_DISABLED: docs
   - name: "autotools shared libxml2"
     variables:
       FC_BUILDSYS: autotools
       FC_BUILD_TYPE: shared
       FC_XML_BACKEND: libxml2
+      FC_BUILD_DISABLED: docs
   - name: "autotools static expat"
     variables:
       FC_BUILDSYS: autotools
       FC_BUILD_TYPE: static
       FC_XML_BACKEND: expat
+      FC_BUILD_DISABLED: docs
   - name: "autotools static libxml2"
     variables:
       FC_BUILDSYS: autotools
       FC_BUILD_TYPE: static
       FC_XML_BACKEND: libxml2
+      FC_BUILD_DISABLED: docs
   - name: "meson shared expat"
     variables:
       FC_BUILDSYS: meson
@@ -67,6 +71,10 @@ test_patterns:
       FC_BUILDSYS: meson
       FC_BUILD_TYPE: shared
       FC_BUILD_ASAN: address,undefined
+  - name: "cache-compat"
+    parent: "meson shared expat"
+    variables:
+      FC_BASELINE_TAG: ""
 
 distributions:
   - name: alpine
@@ -194,7 +202,7 @@ packages:
         "git",
         "git-clang-format",
         "docbook-utils",
-        "docbook-utils-pdf",
+        "wkhtmltopdf",
         "bubblewrap",
         "ninja-build",
         "wget",
@@ -219,7 +227,7 @@ packages:
         "git",
         "wget",
         "python3",
-        "py311-pip",
+        "py312-pip",
         "pkgconf",
         "gmake",
         "gettext-runtime",
