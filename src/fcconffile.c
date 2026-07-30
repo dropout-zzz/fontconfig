@@ -122,6 +122,8 @@ FcConfigFileGenerate (FcConfig      *config,
                       const FcChar8 *font_path)
 {
     FcFontSet *fs = NULL;
+    FcChar8   *ret;
+    FcBool     failed = FcFalse;
     int        i;
     FcStrBuf   buf;
 
@@ -143,6 +145,10 @@ FcConfigFileGenerate (FcConfig      *config,
     }
     if (fs->nfont > 0) {
 	FcHashTable *record = NULL;
+	FcChar8     *target_family = NULL;
+	FcBool       found = FcFalse;
+
+	FcPatternObjectGetString (pat, FC_FAMILY_OBJECT, 0, &target_family);
 
 	FcStrBufString (&buf,
 	                (const FcChar8 *)
@@ -167,24 +173,41 @@ FcConfigFileGenerate (FcConfig      *config,
 	                                  &family) != FcResultMatch) {
 		continue;
 	    }
+	    if (target_family &&
+	        FcStrCmpIgnoreBlanksAndCase (family, target_family) != 0) {
+		continue;
+	    }
+	    found = FcTrue;
 	    if (!FcHashTableFind (record, family, (void **)&p)) {
 		FcPatternReference (p);
 		FcHashTableReplace (record, (void *)family, (void *)p);
 		if (!FcConfigFileGenerateGenericAlias (config, pat, p, &buf)) {
-		    FcStrBufDestroy (&buf);
-		    FcStrBufInit (&buf, NULL, 0);
+		    failed = FcTrue;
 		    goto bail;
 		}
 	    }
 	}
 	FcHashTableDestroy (record);
 
+	if (target_family && !found) {
+	    fprintf (stderr, "Fontconfig warning: %s: family not found in %s\n",
+	             target_family, font_path);
+	    failed = FcTrue;
+	    goto bail;
+	}
+
 	FcStrBufString (&buf, (const FcChar8 *)"</fontconfig>\n");
     }
 bail:
     FcFontSetDestroy (fs);
 
-    return FcStrBufDone (&buf);
+    ret = FcStrBufDone (&buf);
+    if (failed && ret) {
+	free (ret);
+	ret = NULL;
+    }
+
+    return ret;
 }
 
 #define __fcconffile__
