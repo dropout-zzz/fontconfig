@@ -767,6 +767,37 @@ bail:
     return fail;
 }
 
+static int
+process_scan (FcConfig  *config,
+              FcFontSet *fs,
+              FcFontSet *result_fs)
+{
+    FcFontSet *scan_fs;
+    int        fail = 0;
+
+    if (!fs) {
+	fprintf (stderr, "E: no fonts defined.\n");
+	fail++;
+	goto bail;
+    }
+    if (!result_fs) {
+	fprintf (stderr, "E: no result_fs defined.\n");
+	fail++;
+	goto bail;
+    }
+
+    scan_fs = FcFontSetCreate();
+    for (int i = 0; i < fs->nfont; i++) {
+	FcPattern *pat = FcPatternDuplicate (fs->fonts[i]);
+	FcConfigSubstitute (config, pat, FcMatchScan);
+	FcFontSetAdd (scan_fs, pat);
+    }
+    fail = process_fs (config, scan_fs, result_fs);
+    FcFontSetDestroy (scan_fs);
+bail:
+    return fail;
+}
+
 static FcBool
 run_test (FcConfig *config, json_object *root)
 {
@@ -844,6 +875,8 @@ run_test (FcConfig *config, json_object *root)
 	} else if (method != NULL &&
 	           strcmp (method, "pattern") == 0) {
 	    fail += process_pattern (config, query, result);
+	} else if (method != NULL && strcmp (method, "scan") == 0) {
+	    fail += process_scan (config, config->fonts[FcSetSystem], result_fs);
 	} else {
 	    fprintf (stderr, "W: unknown testing method: %s\n", method);
 	}

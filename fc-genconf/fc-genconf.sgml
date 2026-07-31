@@ -135,7 +135,7 @@ specific generic alias rule.
           <option><replaceable>name</replaceable></option>
         </term>
         <listitem>
-          <para>Set a family name to generate a configuration for instead of the family name in the font metadata.</para>
+          <para>Restrict the target family to <replaceable>name</replaceable> in a font. This is particularly useful to generate a config for a certain family name in TTC font.</para>
         </listitem>
       </varlistentry>
       <varlistentry>
