@@ -33,7 +33,7 @@ def test_genconf(fctest, fcfont, parametrized_external_font):
     gl = []
     f = fmt = None
     for ret, stdout, stderr in fctest.run_query(
-        ["-f", "%{family}:%{genericfamily}\n", parametrized_external_font]
+        ["-f", "%{family[0]}:%{genericfamily}\n", parametrized_external_font]
     ):
         assert ret == 0, stderr
         for l in stdout.strip().splitlines():

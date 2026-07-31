@@ -267,6 +267,126 @@ FcExprCreateOp (FcConfig *config, FcExpr *left, FcOp op, FcExpr *right)
     return e;
 }
 
+static FcExpr *
+FcExprDup (FcConfig *config, const FcExpr *e)
+{
+    FcExpr *ret = NULL;
+
+    if (!e)
+	return NULL;
+    switch (FC_OP_GET_OP (e->op)) {
+    case FcOpInteger:
+	ret = FcExprCreateInteger (config, e->u.ival);
+	break;
+    case FcOpDouble:
+	ret = FcExprCreateDouble (config, e->u.dval);
+	break;
+    case FcOpString:
+	ret = FcExprCreateString (config, e->u.sval);
+	break;
+    case FcOpMatrix: {
+	FcExpr      *xx = NULL, *xy = NULL, *yx = NULL, *yy = NULL;
+	FcExprMatrix m;
+
+	xx = FcExprDup (config, e->u.mexpr->xx);
+	xy = FcExprDup (config, e->u.mexpr->xy);
+	yx = FcExprDup (config, e->u.mexpr->yx);
+	yy = FcExprDup (config, e->u.mexpr->yy);
+	if (!xx || !xy || !yx || !yy)
+	    goto bail_matrix;
+	m.xx = xx;
+	m.xy = xy;
+	m.yx = yx;
+	m.yy = yy;
+	ret = FcExprCreateMatrix (config, &m);
+	break;
+    bail_matrix:
+	if (xx)
+	    FcExprDestroy (xx);
+	if (xy)
+	    FcExprDestroy (xy);
+	if (yx)
+	    FcExprDestroy (yx);
+	if (yy)
+	    FcExprDestroy (yy);
+	break;
+    }
+    case FcOpRange:
+	ret = FcExprCreateRange (config, e->u.rval);
+	break;
+    case FcOpBool:
+	ret = FcExprCreateBool (config, e->u.bval);
+	break;
+    case FcOpCharSet:
+	ret = FcExprCreateCharSet (config, e->u.cval);
+	break;
+    case FcOpLangSet:
+	ret = FcExprCreateLangSet (config, e->u.lval);
+	break;
+    case FcOpNil:
+	ret = FcExprCreateNil (config);
+	break;
+    case FcOpField:
+	ret = FcExprCreateName (config, e->u.name);
+	break;
+    case FcOpConst:
+	ret = FcExprCreateConst (config, e->u.constant);
+	break;
+    case FcOpAssign:
+    case FcOpAssignReplace:
+    case FcOpPrependFirst:
+    case FcOpPrepend:
+    case FcOpAppend:
+    case FcOpAppendLast:
+    case FcOpDelete:
+    case FcOpDeleteAll:
+    case FcOpQuest:
+    case FcOpOr:
+    case FcOpAnd:
+    case FcOpEqual:
+    case FcOpNotEqual:
+    case FcOpContains:
+    case FcOpListing:
+    case FcOpNotContains:
+    case FcOpLess:
+    case FcOpLessEqual:
+    case FcOpMore:
+    case FcOpMoreEqual:
+    case FcOpPlus:
+    case FcOpMinus:
+    case FcOpTimes:
+    case FcOpDivide:
+    case FcOpNot:
+    case FcOpComma:
+    case FcOpFloor:
+    case FcOpCeil:
+    case FcOpRound:
+    case FcOpTrunc:
+    case FcOpInvalid: {
+	ret = FcConfigAllocExpr (config);
+	if (ret) {
+	    ret->op = e->op;
+	    ret->u.tree.left = FcExprDup (config, e->u.tree.left);
+	    ret->u.tree.right = NULL;
+	    if (e->u.tree.left && !ret->u.tree.left) {
+		FcExprDestroy (ret);
+		return NULL;
+	    }
+	    ret->u.tree.right = FcExprDup (config, e->u.tree.right);
+	    if (e->u.tree.right && !ret->u.tree.right) {
+		FcExprDestroy (ret);
+		return NULL;
+	    }
+	}
+	break;
+    }
+    default:
+	/* unlikely */
+	break;
+    }
+    return ret;
+}
+
 static void
 FcExprDestroy (FcExpr *e)
 {
@@ -1835,11 +1955,202 @@ FcParseFamily (FcConfigParse *parse)
 	FcVStackPushExpr (parse, FcVStackFamily, expr);
 }
 
+static FcBool
+_FcParseAliasAddScanDeleteRule (FcConfigParse *parse,
+                                const FcExpr  *leaf,
+                                int            gf_value)
+{
+    FcExpr *e, *ex;
+    FcTest *t, *t2;
+    FcEdit *ed;
+    FcRule *r1, *r2, *r3;
+    int     n;
+
+    e = FcExprDup (parse->config, leaf);
+    if (!e)
+	return FcFalse;
+    t = FcTestCreate (parse, FcMatchScan, FcQualAny,
+                      (FcChar8 *)FC_FAMILY,
+                      FC_OP (FcOpEqual, FcOpFlagIgnoreBlanks), e);
+    if (!t) {
+	FcExprDestroy (e);
+	return FcFalse;
+    }
+    r1 = FcRuleCreate (FcRuleTest, t);
+    if (!r1) {
+	FcTestDestroy (t);
+	return FcFalse;
+    }
+    ex = FcExprCreateInteger (parse->config, gf_value);
+    if (!ex) {
+	FcRuleDestroy (r1);
+	return FcFalse;
+    }
+    t2 = FcTestCreate (parse, FcMatchScan, FcQualAny,
+                       (FcChar8 *)FC_GENERIC_FAMILY,
+                       FcOpEqual, ex);
+    if (!t2) {
+	FcExprDestroy (ex);
+	FcRuleDestroy (r1);
+	return FcFalse;
+    }
+    r2 = FcRuleCreate (FcRuleTest, t2);
+    if (!r2) {
+	FcTestDestroy (t2);
+	FcRuleDestroy (r1);
+	return FcFalse;
+    }
+    r1->next = r2;
+    ed = FcEditCreate (parse, FC_GENERIC_FAMILY_OBJECT,
+                       FcOpDelete, NULL, FcValueBindingWeak);
+    if (!ed) {
+	FcRuleDestroy (r1);
+	return FcFalse;
+    }
+    r3 = FcRuleCreate (FcRuleEdit, ed);
+    if (!r3) {
+	FcEditDestroy (ed);
+	FcRuleDestroy (r1);
+	return FcFalse;
+    }
+    r2->next = r3;
+    if ((n = FcRuleSetAdd (parse->ruleset, r1, FcMatchScan)) == -1) {
+	FcRuleDestroy (r1);
+	return FcFalse;
+    }
+    if (parse->config->maxObjects < n)
+	parse->config->maxObjects = n;
+    return FcTrue;
+}
+
+static void
+_FcParseAliasAddScanRule (FcConfigParse *parse,
+                          const FcExpr  *leaf,
+                          const FcChar8 *generic,
+                          FcOp           op,
+                          FcValueBinding binding)
+{
+    FcExpr           *e, *ex;
+    FcTest           *t;
+    FcEdit           *ed;
+    FcRule           *rt, *re;
+    int               n;
+    const FcConstant *c;
+
+    c = FcNameGetConstantFor (generic, FC_GENERIC_FAMILY);
+    if (!c)
+	return;
+
+    if (c->value != FC_FAMILY_UNKNOWN)
+	_FcParseAliasAddScanDeleteRule (parse, leaf, FC_FAMILY_UNKNOWN);
+    _FcParseAliasAddScanDeleteRule (parse, leaf, c->value);
+
+    e = FcExprDup (parse->config, leaf);
+    if (!e)
+	return;
+    t = FcTestCreate (parse, FcMatchScan, FcQualAny,
+                      (FcChar8 *)FC_FAMILY,
+                      FC_OP (FcOpEqual, FcOpFlagIgnoreBlanks), e);
+    if (!t) {
+	FcExprDestroy (e);
+	return;
+    }
+    rt = FcRuleCreate (FcRuleTest, t);
+    if (!rt) {
+	FcTestDestroy (t);
+	return;
+    }
+    ex = FcExprCreateConst (parse->config, generic);
+    if (!ex) {
+	FcRuleDestroy (rt);
+	return;
+    }
+    ed = FcEditCreate (parse, FC_GENERIC_FAMILY_OBJECT,
+                       FcOpAppend, ex, binding);
+    if (!ed) {
+	FcExprDestroy (ex);
+	FcRuleDestroy (rt);
+	return;
+    }
+    re = FcRuleCreate (FcRuleEdit, ed);
+    if (!re) {
+	FcEditDestroy (ed);
+	FcRuleDestroy (rt);
+	return;
+    }
+    rt->next = re;
+    if ((n = FcRuleSetAdd (parse->ruleset, rt, FcMatchScan)) == -1)
+	FcRuleDestroy (rt);
+    else if (parse->config->maxObjects < n)
+	parse->config->maxObjects = n;
+}
+
+static void
+_FcParseAliasForGenericFamilyWalk (FcConfigParse *parse,
+                                   const FcExpr  *edit,
+                                   const FcChar8 *generic,
+                                   FcOp           op,
+                                   FcValueBinding binding)
+{
+    while (edit) {
+	if (edit->op == FcOpString) {
+	    _FcParseAliasAddScanRule (parse, edit, generic, op, binding);
+	    break;
+	} else if (edit->op == FcOpComma) {
+	    if (edit->u.tree.left)
+		_FcParseAliasForGenericFamilyWalk (parse, edit->u.tree.left, generic, op, binding);
+	    edit = edit->u.tree.right;
+	} else {
+	    break;
+	}
+    }
+}
+
+static void
+FcParseAliasForGenericFamily (FcConfigParse *parse,
+                              const FcExpr  *test,
+                              const FcExpr  *edit,
+                              FcOp           op,
+                              FcValueBinding binding)
+{
+    const FcConstant *c;
+
+    if (!test || test->op != FcOpString || !edit)
+	return;
+    c = FcNameGetConstantFor (test->u.sval, FC_GENERIC_FAMILY);
+    if (!c)
+	return;
+    _FcParseAliasForGenericFamilyWalk (parse, edit, test->u.sval, op, binding);
+}
+
+static void
+FcParseAliasAddEdit (FcConfigParse *parse,
+                     FcExpr        *texpr,
+                     FcExpr        *eexpr,
+                     FcOp           op,
+                     FcValueBinding binding,
+                     FcRule       **tail_for_pat)
+{
+    FcEdit *edit;
+
+    edit = FcEditCreate (parse, FC_FAMILY_OBJECT, op, eexpr, binding);
+    if (!edit) {
+	FcExprDestroy (eexpr);
+	return;
+    }
+    (*tail_for_pat)->next = FcRuleCreate (FcRuleEdit, edit);
+    if (!(*tail_for_pat)->next) {
+	FcEditDestroy (edit);
+	return;
+    }
+    *tail_for_pat = (*tail_for_pat)->next;
+    FcParseAliasForGenericFamily (parse, texpr, eexpr, op, binding);
+}
+
 static void
 FcParseAlias (FcConfigParse *parse)
 {
     FcExpr        *family = 0, *accept = 0, *prefer = 0, *def = 0, *newp = 0;
-    FcEdit        *edit = 0;
     FcVStack      *vstack;
     FcRule        *rule = NULL, *r;
     FcValueBinding binding;
@@ -1931,49 +2242,19 @@ FcParseAlias (FcConfigParse *parse)
 	    r = rule = FcRuleCreate (FcRuleTest, t);
 	}
     }
-    if (prefer) {
-	edit = FcEditCreate (parse,
-	                     FC_FAMILY_OBJECT,
-	                     FcOpPrepend,
-	                     prefer,
-	                     binding);
-	if (!edit)
-	    FcExprDestroy (prefer);
-	else {
-	    r->next = FcRuleCreate (FcRuleEdit, edit);
-	    r = r->next;
-	}
-    }
-    if (accept) {
-	edit = FcEditCreate (parse,
-	                     FC_FAMILY_OBJECT,
-	                     FcOpAppend,
-	                     accept,
-	                     binding);
-	if (!edit)
-	    FcExprDestroy (accept);
-	else {
-	    r->next = FcRuleCreate (FcRuleEdit, edit);
-	    r = r->next;
-	}
-    }
-    if (def) {
-	edit = FcEditCreate (parse,
-	                     FC_FAMILY_OBJECT,
-	                     FcOpAppendLast,
-	                     def,
-	                     binding);
-	if (!edit)
-	    FcExprDestroy (def);
-	else {
-	    r->next = FcRuleCreate (FcRuleEdit, edit);
-	    r = r->next;
-	}
-    }
-    if ((n = FcRuleSetAdd (parse->ruleset, rule, FcMatchPattern)) == -1)
+    if (prefer)
+	FcParseAliasAddEdit (parse, family, prefer, FcOpPrepend, binding, &r);
+    if (accept)
+	FcParseAliasAddEdit (parse, family, accept, FcOpAppend, binding, &r);
+    if (def)
+	FcParseAliasAddEdit (parse, family, def, FcOpAppendLast, binding, &r);
+
+    if ((n = FcRuleSetAdd (parse->ruleset, rule, FcMatchPattern)) == -1) {
 	FcRuleDestroy (rule);
-    else if (parse->config->maxObjects < n)
+	return;
+    } else if (parse->config->maxObjects < n) {
 	parse->config->maxObjects = n;
+    }
 }
 
 static void
