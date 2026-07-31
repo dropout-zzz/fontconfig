@@ -169,12 +169,12 @@ retry:
 #elif defined(HAVE_GETPROGNAME)
 	const char *q = getprogname();
 	if (q)
-	    prgname = FcStrCopy (q);
+	    prgname = FcStrCopy ((const FcChar8 *)q);
 	else
-	    prgname = FcStrCopy ("");
+	    prgname = FcStrCopy ((const FcChar8 *)"");
 #else
 #  if defined(HAVE_GETEXECNAME)
-	char *p = FcStrCopy (getexecname());
+	char *p = FcStrCopy ((const FcChar8 *)getexecname());
 #  elif defined(HAVE_READLINK)
 	size_t size = FC_PATH_MAX;
 	char  *p = NULL;

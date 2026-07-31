@@ -404,7 +404,7 @@ FcFStatFs (int fd, FcStatFS *statb)
 FcBool
 FcIsFsMmapSafe (int fd)
 {
-    FcStatFS statb;
+    FcStatFS statb = { FcFalse, FcFalse };
 
     if (FcFStatFs (fd, &statb) < 0)
 	return FcTrue;
