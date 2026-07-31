@@ -301,7 +301,7 @@ msys2:latest@container-clean:
     - echo "BUILD_ID=\"$BUILD_ID\"" >> fcenv
     - echo "MAKEFLAGS=\"$MAKEFLAGS\"" >> fcenv
     - "scp fcenv vm:~/$CI_PROJECT_NAME/.gitlab-ci/fcenv"
-    - /app/vmctl exec "cd $CI_PROJECT_NAME ; python3 .gitlab-ci/build.py ${buildopt[@]}" && touch .success || true
+    - /app/vmctl exec "cd $CI_PROJECT_NAME ; python3 .gitlab-ci/build.py -E ${buildopt[@]}" && touch .success || true
     - scp -r vm:$CI_PROJECT_NAME/build $BUILDDIR
 
     - *check_tainted
@@ -362,13 +362,13 @@ msys2:latest@container-clean:
         mkdir -p ~/.wine/drive_c/msys64/$fc_parent_builddir
         CWD=$(pwd)
         mv $CI_PROJECT_DIR ~/.wine/drive_c/msys64/$fc_parent_builddir/
-        echo "${FC_BUILD_SH[@]} 'cd \$1; shift; python3 .gitlab-ci/build.py \"\$@\"' -- \"$CWD\" \"${buildopt[@]}\""
-        ${FC_BUILD_SH[@]} 'cd $1; shift; python3 .gitlab-ci/build.py "$@"' -- "$CWD" "${buildopt[@]}"
+        echo "${FC_BUILD_SH[@]} 'cd \$1; shift; python3 .gitlab-ci/build.py -E \"\$@\"' -- \"$CWD\" \"${buildopt[@]}\""
+        ${FC_BUILD_SH[@]} 'cd $1; shift; python3 .gitlab-ci/build.py -E "$@"' -- "$CWD" "${buildopt[@]}"
         mv ~/.wine/drive_c/msys64/$CI_PROJECT_DIR $fc_parent_builddir/
         cd $CWD
       else
-        echo python3 .gitlab-ci/build.py ${buildopt[@]}
-        python3 .gitlab-ci/build.py ${buildopt[@]}
+        echo python3 .gitlab-ci/build.py -E ${buildopt[@]}
+        python3 .gitlab-ci/build.py -E ${buildopt[@]}
       fi
   variables:
     FC_BUILDSYS: autotools
