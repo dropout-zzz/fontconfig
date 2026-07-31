@@ -3,7 +3,8 @@
 .fdo.msys2:
   variables:
     FDO_DISTRIBUTION_NAME: msys2
-    FDO_CBUILD: https://gitlab.freedesktop.org/api/v4/projects/5761/packages/generic/cbuild/sha256-679ce0ba1077495a53c205a25176a4caf1d062a9d3af465c565bd824c07c8f1f/cbuild
+    _FDO_CI_REGISTRY_IMAGE: $CI_REGISTRY/$FDO_UPSTREAM_REPO
+    FDO_CBUILD: https://gitlab.freedesktop.org/api/v4/projects/5761/packages/generic/cbuild/sha256-640d8609476de424362321f00833f212826b3b8a180eef9f214ef2af0e2fc684/cbuild
 
 .pull.cbuild@msys2:
   script: &pull-cbuild
@@ -38,37 +39,39 @@
   artifacts:
     paths:
       - container-build-report.xml
+      - ci-templates.env
     reports:
       junit: container-build-report.xml
+      dotenv: ci-templates.env
 
 .fdo.container-build@msys2:
   extends: .fdo.container-build-common@msys2
-  image: quay.io/freedesktop.org/ci-templates:container-build-base-2025-08-15.0
+  image: quay.io/freedesktop.org/ci-templates:container-build-base-2026-05-19.0
 
 .fdo.container-build@msys2@x86_64:
   extends: .fdo.container-build@msys2
 
 .fdo.distribution-image@msys2:
   extends: .fdo.msys2
-  image: $CI_REGISTRY_IMAGE/msys2/$FDO_DISTRIBUTION_VERSION:$FDO_DISTRIBUTION_TAG
+  image: $_FDO_CI_REGISTRY_IMAGE/msys2/$FDO_DISTRIBUTION_VERSION:$FDO_DISTRIBUTION_TAG
   variables:
-    FDO_DISTRIBUTION_IMAGE: $CI_REGISTRY_IMAGE/msys2/$FDO_DISTRIBUTION_VERSION:$FDO_DISTRIBUTION_TAG
+    FDO_DISTRIBUTION_IMAGE: $_FDO_CI_REGISTRY_IMAGE/msys2/$FDO_DISTRIBUTION_VERSION:$FDO_DISTRIBUTION_TAG
 
 .fdo.suffixed-image@msys2:
   extends: .fdo.msys2
-  image: $CI_REGISTRY_IMAGE/$FDO_REPO_SUFFIX:$FDO_DISTRIBUTION_TAG
+  image: $_FDO_CI_REGISTRY_IMAGE/$FDO_REPO_SUFFIX:$FDO_DISTRIBUTION_TAG
   variables:
-    FDO_DISTRIBUTION_IMAGE: $CI_REGISTRY_IMAGE/$FDO_REPO_SUFFIX:$FDO_DISTRIBUTION_TAG
+    FDO_DISTRIBUTION_IMAGE: $_FDO_CI_REGISTRY_IMAGE/$FDO_REPO_SUFFIX:$FDO_DISTRIBUTION_TAG
 
 .fdo.b2c-image@msys2:
   extends: .fdo.msys2
-  image: quay.io/freedesktop.org/ci-templates:qemu-base-2024-07-12.0
+  image: quay.io/freedesktop.org/ci-templates:qemu-base-2026-05-19.0
   variables:
-    FDO_DISTRIBUTION_IMAGE: $CI_REGISTRY_IMAGE/msys2/$FDO_DISTRIBUTION_VERSION:$FDO_DISTRIBUTION_TAG
+    FDO_DISTRIBUTION_IMAGE: $_FDO_CI_REGISTRY_IMAGE/msys2/$FDO_DISTRIBUTION_VERSION:$FDO_DISTRIBUTION_TAG
     B2C_IMAGE: $FDO_DISTRIBUTION_IMAGE
 
 .fdo.b2c-suffixed-image@msys2:
   extends: .fdo.b2c-image@msys2
   variables:
-    FDO_DISTRIBUTION_IMAGE: $CI_REGISTRY_IMAGE/$FDO_REPO_SUFFIX:$FDO_DISTRIBUTION_TAG
+    FDO_DISTRIBUTION_IMAGE: $_FDO_CI_REGISTRY_IMAGE/$FDO_REPO_SUFFIX:$FDO_DISTRIBUTION_TAG
     B2C_IMAGE: $FDO_DISTRIBUTION_IMAGE

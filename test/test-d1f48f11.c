@@ -172,7 +172,7 @@ unlink_dirs (const char *dir)
     return ret;
 }
 
-char template[512] = "/tmp/fc-d1f48f11-XXXXXX";
+char  template[512] = "/tmp/fc-d1f48f11-XXXXXX";
 char  systempl[512] = "/tmp/fc-d1f48f11-XXXXXX";
 char *rootdir, *sysroot;
 
@@ -183,23 +183,23 @@ setup (char *dir)
     FILE    *fp;
     int      ret = 1;
 
-    confdir = FcStrBuildFilename (dir, "conf.d", NULL);
-    availdir = FcStrBuildFilename (dir, "conf.avail", NULL);
-    mkdir_p (confdir);
-    mkdir_p (availdir);
+    confdir = FcStrBuildFilename ((const FcChar8 *)dir, "conf.d", NULL);
+    availdir = FcStrBuildFilename ((const FcChar8 *)dir, "conf.avail", NULL);
+    mkdir_p ((const char *)confdir);
+    mkdir_p ((const char *)availdir);
     real = FcStrBuildFilename (availdir, "00-foo.conf", NULL);
     link = FcStrBuildFilename (confdir, "00-foo.conf", NULL);
     if (!real || !link) {
 	fprintf (stderr, "E: unable to allocate memory\n");
 	goto bail;
     }
-    if ((fp = fopen (real, "wb")) == NULL) {
+    if ((fp = fopen ((const char *)real, "wb")) == NULL) {
 	fprintf (stderr, "E: unable to open a file\n");
 	goto bail;
     }
     fprintf (fp, "%s", real);
     fclose (fp);
-    if (symlink ("../conf.avail/00-foo.conf", link) != 0) {
+    if (symlink ("../conf.avail/00-foo.conf", (const char *)link) != 0) {
 	fprintf (stderr, "%s: %s\n", link, strerror (errno));
 	goto bail;
     }
@@ -241,15 +241,15 @@ main (void)
 	fprintf (stderr, "%s: %s\n", systempl, strerror (errno));
 	return 1;
     }
-    ds = FcStrBuildFilename (sysroot, rootdir, NULL);
+    ds = FcStrBuildFilename ((const FcChar8 *)sysroot, rootdir, NULL);
 
     if (setup (rootdir) != 0)
 	goto bail;
-    if (setup (ds) != 0)
+    if (setup ((char *)ds) != 0)
 	goto bail;
 
-    dc = FcStrBuildFilename (rootdir, "conf.d", "00-foo.conf", NULL);
-    da = FcStrBuildFilename (rootdir, "conf.avail", "00-foo.conf", NULL);
+    dc = FcStrBuildFilename ((const FcChar8 *)rootdir, "conf.d", "00-foo.conf", NULL);
+    da = FcStrBuildFilename ((const FcChar8 *)rootdir, "conf.avail", "00-foo.conf", NULL);
     cfg = FcConfigCreate();
     d = FcConfigRealFilename (cfg, dc);
     if (strcmp ((const char *)d, (const char *)da) != 0) {
@@ -261,7 +261,7 @@ main (void)
     FcConfigDestroy (cfg);
     setenv ("FONTCONFIG_SYSROOT", sysroot, 1);
     cfg = FcConfigCreate();
-    dsa = FcStrBuildFilename (sysroot, da, NULL);
+    dsa = FcStrBuildFilename ((const FcChar8 *)sysroot, da, NULL);
     dsac = FcStrCanonFilename (dsa);
     d = FcConfigRealFilename (cfg, dc);
     if (strcmp ((const char *)d, (const char *)dsac) != 0) {

@@ -11,7 +11,7 @@ if (fontations.enabled())
     args: [
       '--merge-extern-blocks',
       '--allowlist-item=(FcCharSet.*|FC_(SLANT|WEIGHT|WIDTH)_.*|FcFontSet(Add|Create|Destroy).*|FcLangSet(Create|Destroy|Copy|Add|HasLang)|FcWeightFromOpenType.*|FC_SPACING_.*|FC_FAMILY_.*)',
-      '--raw-line=#![allow(nonstandard_style,unused)]',
+      '--raw-line=#![allow(nonstandard_style,unused,unnecessary_transmutes)]',
     ],
     # FC_NO_MT=1 is added here to reduce required headers in bindings generation.
     # It does not mean a functional change in multi-threading behavior.
@@ -26,7 +26,7 @@ if (fontations.enabled())
       '--merge-extern-blocks',
       '--allowlist-item=(FcPattern.*|FcRange.*|FC_.*_OBJECT|FcCharSet.*|FcLangSetFromCharSet|FcGenericAliasGetClassification)',
       '--blocklist-type=(FcCharSet|FcLangSet)',
-      '--raw-line=#![allow(nonstandard_style,unused)]',
+      '--raw-line=#![allow(nonstandard_style,unused,unnecessary_transmutes)]',
       '--raw-line=extern crate fontconfig_bindings;',
       '--raw-line=pub use fontconfig_bindings::FcCharSet; pub use fontconfig_bindings::FcLangSet;',
     ],
