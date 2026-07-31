@@ -12,7 +12,7 @@
 # and run ci-fairy generate-template. For details, see
 # https://freedesktop.pages.freedesktop.org/ci-templates/ci-fairy.html#templating-gitlab-ci-yml
 
-.templates_sha: &template_sha baa94a8f673dd1f11f81377106310752936d3672
+.templates_sha: &template_sha 208764ef4d97de775cee10f1c206635e2964b257
 
 include:
   {% for distro in distributions|sort(attribute="name")|unique(attribute="name") if distro.name != "msys2" %}

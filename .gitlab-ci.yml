@@ -10,7 +10,7 @@
 # and run ci-fairy generate-template. For details, see
 # https://freedesktop.pages.freedesktop.org/ci-templates/ci-fairy.html#templating-gitlab-ci-yml
 
-.templates_sha: &template_sha baa94a8f673dd1f11f81377106310752936d3672
+.templates_sha: &template_sha 208764ef4d97de775cee10f1c206635e2964b257
 
 include:
   # Alpine container builder template
@@ -47,10 +47,10 @@ variables:
 # changing these will force rebuilding the associated image
 # Note: these tags have no meaning and are not tied to a particular
 # fontconfig version
-  ALPINE_TAG:    '2026-07-29.0-e868d6b004e1'
-  FEDORA_TAG:    '2026-07-29.0-b8b4ece0743d'
-  FREEBSD_TAG:   '2026-07-29.0-6d2dfdefb2e0'
-  MSYS2_TAG:     '2026-07-29.0-59740ef015cf'
+  ALPINE_TAG:    '2026-07-31.0-6cd131b8a989'
+  FEDORA_TAG:    '2026-07-31.0-1bbd7947c10a'
+  FREEBSD_TAG:   '2026-07-31.0-e296a631b071'
+  MSYS2_TAG:     '2026-07-31.0-0acfac0a7390'
 
   ALPINE_EXEC:   'bash .gitlab-ci/alpine-install.sh'
   FEDORA_EXEC:   'bash .gitlab-ci/fedora-install.sh'
