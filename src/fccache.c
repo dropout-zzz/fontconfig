@@ -114,6 +114,7 @@ bail:
 
 #define CACHEBASE_LEN (1 + 36 + 1 + sizeof (FC_ARCHITECTURE) + sizeof (FC_CACHE_SUFFIX))
 
+#ifdef HAVE_SYMLINK
 static FcChar8 *
 FcDirCacheReplaceVersion (const FcChar8 *cache_base,
 			  FcChar8 compat_base[CACHEBASE_LEN],
@@ -129,6 +130,7 @@ FcDirCacheReplaceVersion (const FcChar8 *cache_base,
     sprintf ((char *)compat_base + prefix_len, ".cache-%d", version);
     return compat_base;
 }
+#endif
 
 static FcBool
 FcCacheIsMmapSafe (int fd)

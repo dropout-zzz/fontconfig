@@ -164,7 +164,7 @@ retry:
 		buf[len] = '\0';
 	    }
 
-	    prgname = FcStrCopy (p);
+	    prgname = FcStrCopy ((const FcChar8 *)p);
 	}
 #elif defined(HAVE_GETPROGNAME)
 	const char *q = getprogname();
