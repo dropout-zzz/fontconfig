@@ -12,17 +12,21 @@ build_patterns:
       FC_BUILDSYS: meson
       FC_BUILD_TYPE: shared
       FC_XML_BACKEND: expat
+      FC_TEST_EXEC: cache-compat
+      FC_BASELINE_TAG: ""
   - name: "meson shared libxml2"
     variables:
       FC_BUILDSYS: meson
       FC_BUILD_TYPE: shared
       FC_XML_BACKEND: libxml2
+      FC_TEST_EXEC: meson-install-shared
   - name: "meson static libxml2 fontations"
     variables:
       FC_BUILDSYS: meson
       FC_BUILD_TYPE: static
       FC_XML_BACKEND: libxml2
       FC_BUILD_ENABLED: "fontations"
+      FC_TEST_EXEC: meson-install-static
 
 test_patterns:
   - name: "subproject-build shared"
@@ -35,19 +39,11 @@ test_patterns:
       FC_BUILDSYS: meson
       FC_BUILD_TYPE: static
       FC_BUILD_SUBPROJECT: 1
-  - name: "meson-install-shared"
-    parent: "meson shared libxml2"
-  - name: "meson-install-static"
-    parent: "meson static libxml2 fontations"
   - name: "ASAN/UBSAN"
     variables:
       FC_BUILDSYS: meson
       FC_BUILD_TYPE: shared
       FC_BUILD_ASAN: address,undefined
-  - name: "cache-compat"
-    parent: "meson shared expat"
-    variables:
-      FC_BASELINE_TAG: ""
 
 distributions:
   - name: alpine

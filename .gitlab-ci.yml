@@ -34,7 +34,6 @@ include:
 stages:
   - sanity check
   - prep
-  - build
   - test
   - distro
   - deploy
@@ -48,10 +47,10 @@ variables:
 # changing these will force rebuilding the associated image
 # Note: these tags have no meaning and are not tied to a particular
 # fontconfig version
-  ALPINE_TAG:    '2026-07-29.0-87560b1bc378'
-  FEDORA_TAG:    '2026-07-29.0-43004307e83a'
-  FREEBSD_TAG:   '2026-07-29.0-e91d5ee4ed69'
-  MSYS2_TAG:     '2026-07-29.0-47ddce642f40'
+  ALPINE_TAG:    '2026-07-29.0-e868d6b004e1'
+  FEDORA_TAG:    '2026-07-29.0-b8b4ece0743d'
+  FREEBSD_TAG:   '2026-07-29.0-6d2dfdefb2e0'
+  MSYS2_TAG:     '2026-07-29.0-59740ef015cf'
 
   ALPINE_EXEC:   'bash .gitlab-ci/alpine-install.sh'
   FEDORA_EXEC:   'bash .gitlab-ci/fedora-install.sh'
@@ -370,6 +369,10 @@ msys2:latest@container-clean:
         echo python3 .gitlab-ci/build.py -E ${buildopt[@]}
         python3 .gitlab-ci/build.py -E ${buildopt[@]}
       fi
+    - |
+      if [ -n "$FC_TEST_EXEC" ] && [ -f ".gitlab-ci/test-${FC_TEST_EXEC}.sh" ]; then
+        sh ".gitlab-ci/test-${FC_TEST_EXEC}.sh"
+      fi
   variables:
     FC_BUILDSYS: autotools
     FC_XML_BACKEND: expat
@@ -416,12 +419,12 @@ msys2:latest@container-clean:
 
 #######################################
 #                                     #
-#             build stage             #
+#             test stage              #
 #                                     #
 #######################################
 
 build-autotools shared expat:
-  stage: build
+  stage: test
   extends:
     - .build@template
     - .fdo.distribution-image@fedora
@@ -437,7 +440,7 @@ build-autotools shared expat:
   needs:
     - fedora:rawhide@container-prep
 build-meson shared expat:
-  stage: build
+  stage: test
   extends:
     - .build@template
     - .fdo.distribution-image@fedora
@@ -449,10 +452,12 @@ build-meson shared expat:
     FC_BUILDSYS: meson
     FC_BUILD_TYPE: shared
     FC_XML_BACKEND: expat
+    FC_TEST_EXEC: cache-compat
+    FC_BASELINE_TAG: 
   needs:
     - fedora:rawhide@container-prep
 build-meson shared libxml2:
-  stage: build
+  stage: test
   extends:
     - .build@template
     - .fdo.distribution-image@fedora
@@ -464,10 +469,11 @@ build-meson shared libxml2:
     FC_BUILDSYS: meson
     FC_BUILD_TYPE: shared
     FC_XML_BACKEND: libxml2
+    FC_TEST_EXEC: meson-install-shared
   needs:
     - fedora:rawhide@container-prep
 build-meson static libxml2 fontations:
-  stage: build
+  stage: test
   extends:
     - .build@template
     - .fdo.distribution-image@fedora
@@ -480,14 +486,10 @@ build-meson static libxml2 fontations:
     FC_BUILD_TYPE: static
     FC_XML_BACKEND: libxml2
     FC_BUILD_ENABLED: fontations
+    FC_TEST_EXEC: meson-install-static
   needs:
     - fedora:rawhide@container-prep
 
-#######################################
-#                                     #
-#                 test                #
-#                                     #
-#######################################
 
 .test_hook@template:
   script:
@@ -551,34 +553,6 @@ subproject-build static:
     FC_BUILD_SUBPROJECT: 1
   needs:
     - fedora:rawhide@container-prep
-meson-install-shared:
-  stage: test
-  extends:
-    - .test_hook@template
-    - .fdo.distribution-image@fedora
-    - .fc_artifacts
-  variables:
-    FC_DISTRO_NAME: fedora
-    FDO_DISTRIBUTION_VERSION: rawhide
-    FDO_DISTRIBUTION_TAG: $FEDORA_TAG
-    FC_TEST_EXEC: meson-install-shared
-  needs:
-    - fedora:rawhide@container-prep
-    - build-meson shared libxml2
-meson-install-static:
-  stage: test
-  extends:
-    - .test_hook@template
-    - .fdo.distribution-image@fedora
-    - .fc_artifacts
-  variables:
-    FC_DISTRO_NAME: fedora
-    FDO_DISTRIBUTION_VERSION: rawhide
-    FDO_DISTRIBUTION_TAG: $FEDORA_TAG
-    FC_TEST_EXEC: meson-install-static
-  needs:
-    - fedora:rawhide@container-prep
-    - build-meson static libxml2 fontations
 ASAN/UBSAN:
   stage: test
   extends:
@@ -595,21 +569,6 @@ ASAN/UBSAN:
     FC_BUILD_ASAN: address,undefined
   needs:
     - fedora:rawhide@container-prep
-cache-compat:
-  stage: test
-  extends:
-    - .test_hook@template
-    - .fdo.distribution-image@fedora
-    - .fc_artifacts
-  variables:
-    FC_DISTRO_NAME: fedora
-    FDO_DISTRIBUTION_VERSION: rawhide
-    FDO_DISTRIBUTION_TAG: $FEDORA_TAG
-    FC_TEST_EXEC: cache-compat
-    FC_BASELINE_TAG: 
-  needs:
-    - fedora:rawhide@container-prep
-    - build-meson shared expat
 
 abicheck:
   stage: test

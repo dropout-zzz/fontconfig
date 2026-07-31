@@ -111,7 +111,7 @@ MinGW dllexport static:
   stage: test
   image: "docker.io/mstorsjo/llvm-mingw:latest"
   needs:
-    - job: build-meson static expat
+    - job: build-meson static libxml2 fontations
       artifacts: false
   script:
     - export PATH="/root/.local/bin:$PATH"

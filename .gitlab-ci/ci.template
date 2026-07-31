@@ -30,7 +30,6 @@ include:
 stages:
   - sanity check
   - prep
-  - build
   - test
   - distro
   - deploy
@@ -287,6 +286,10 @@ check-ci-script:
         echo python3 .gitlab-ci/build.py -E ${buildopt[@]}
         python3 .gitlab-ci/build.py -E ${buildopt[@]}
       fi
+    - |
+      if [ -n "$FC_TEST_EXEC" ] && [ -f ".gitlab-ci/test-${FC_TEST_EXEC}.sh" ]; then
+        sh ".gitlab-ci/test-${FC_TEST_EXEC}.sh"
+      fi
   variables:
     FC_BUILDSYS: autotools
     FC_XML_BACKEND: expat
@@ -333,13 +336,13 @@ check-ci-script:
 
 #######################################
 #                                     #
-#             build stage             #
+#             test stage              #
 #                                     #
 #######################################
 
 {% for build in build_patterns %}
 build-{{build.name}}:
-  stage: build
+  stage: test
   extends:
     - .build@template
     - .fdo.distribution-image@fedora
@@ -358,11 +361,6 @@ build-{{build.name}}:
     - fedora:rawhide@container-prep
 {% endfor %}
 
-#######################################
-#                                     #
-#                 test                #
-#                                     #
-#######################################
 
 .test_hook@template:
   script:
