@@ -680,8 +680,6 @@ t_alpine:edge:standard build:
     FC_BUILD_TYPE: shared
     FC_XML_BACKEND: expat
     FC_BUILD_DISABLED: nls
-  needs:
-    - 'alpine:edge@container-prep'
 
 
 t_fedora:rawhide:standard build:
@@ -698,8 +696,6 @@ t_fedora:rawhide:standard build:
     FC_BUILD_TYPE: shared
     FC_XML_BACKEND: libxml2
     FC_BUILD_DISTCHECK: 1
-  needs:
-    - 'fedora:rawhide@container-prep'
 
 
 t_fedora:44:standard build:
@@ -716,8 +712,6 @@ t_fedora:44:standard build:
     FC_BUILD_TYPE: shared
     FC_XML_BACKEND: libxml2
     FC_BUILD_DISTCHECK: 1
-  needs:
-    - 'fedora:44@container-prep'
 
 
 t_fedora:43:standard build:
@@ -734,8 +728,6 @@ t_fedora:43:standard build:
     FC_BUILD_TYPE: shared
     FC_XML_BACKEND: libxml2
     FC_BUILD_DISTCHECK: 1
-  needs:
-    - 'fedora:43@container-prep'
 
 
 t_fedora:rawhide:android aarch64:
@@ -756,8 +748,6 @@ t_fedora:rawhide:android aarch64:
     FC_BUILD_NO_INSTALL: 1
     FC_BUILD_DISABLED: nls
     FC_BUILD_NO_CHECK: 1
-  needs:
-    - 'fedora:rawhide@container-prep'
 
 
 t_freebsd:14.3:standard build:
@@ -774,8 +764,6 @@ t_freebsd:14.3:standard build:
     FC_BUILD_TYPE: shared
     FC_XML_BACKEND: libxml2
     FC_BUILD_NO_CHECK: 1
-  needs:
-    - 'freebsd:14.3@container-prep'
 
 
 t_msys2:latest:UCRT64:
@@ -794,8 +782,6 @@ t_msys2:latest:UCRT64:
     FC_BUILD_DISABLED: nls iconv
     FC_BUILD_NO_VENV: 1
     FC_BUILD_SH: msys2 -c
-  needs:
-    - 'msys2:latest@container-prep'
 
 
 t_msys2:latest:MINGW64:
@@ -815,8 +801,6 @@ t_msys2:latest:MINGW64:
     FC_BUILD_NO_VENV: 1
     FC_BUILD_SH: msys2 -c
     MSYSTEM: MINGW64
-  needs:
-    - 'msys2:latest@container-prep'
 
 
 #######################################

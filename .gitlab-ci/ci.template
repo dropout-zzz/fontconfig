@@ -502,8 +502,6 @@ t_{{distro.name}}:{{version}}:{{build.name}}:
     {{key}}: {{value}}
     {% endfor %}
     {% endif %}
-  needs:
-    - '{{distro.name}}:{{version}}@container-prep'
 {% endif %}
 
 {% endfor %}
