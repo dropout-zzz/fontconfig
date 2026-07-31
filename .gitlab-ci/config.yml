@@ -98,7 +98,7 @@ distributions:
     base_type: freebsd
     qemu_based: true
     versions:
-      - "14.3"
+      - "14.4"
     builds:
       - name: "standard build"
         variables:

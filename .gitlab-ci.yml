@@ -47,10 +47,10 @@ variables:
 # changing these will force rebuilding the associated image
 # Note: these tags have no meaning and are not tied to a particular
 # fontconfig version
-  ALPINE_TAG:    '2026-07-31.0-6cd131b8a989'
-  FEDORA_TAG:    '2026-07-31.0-1bbd7947c10a'
-  FREEBSD_TAG:   '2026-07-31.0-e296a631b071'
-  MSYS2_TAG:     '2026-07-31.0-0acfac0a7390'
+  ALPINE_TAG:    '2026-07-31.0-b5c1f6dffcf4'
+  FEDORA_TAG:    '2026-07-31.0-c81dbfddf0ae'
+  FREEBSD_TAG:   '2026-07-31.0-7adc8ae2c6bb'
+  MSYS2_TAG:     '2026-07-31.0-6765f7096ba4'
 
   ALPINE_EXEC:   'bash .gitlab-ci/alpine-install.sh'
   FEDORA_EXEC:   'bash .gitlab-ci/fedora-install.sh'
@@ -140,14 +140,14 @@ fedora:43@container-prep:
     FDO_DISTRIBUTION_TAG: $FEDORA_TAG
     FDO_DISTRIBUTION_EXEC: $FEDORA_EXEC
 
-freebsd:14.3@container-prep:
+freebsd:14.4@container-prep:
   extends: .fdo.qemu-build@freebsd
   tags:
     - kvm
   stage: prep
   variables:
     GIT_STRATEGY: none
-    FDO_DISTRIBUTION_VERSION: '14.3'
+    FDO_DISTRIBUTION_VERSION: '14.4'
     FDO_DISTRIBUTION_PACKAGES: 'gcc gettext gperf expat libxml2 freetype2 json-c git wget python3 py312-pip pkgconf gmake gettext-runtime ninja'
     FDO_DISTRIBUTION_TAG: $FREEBSD_TAG
     FDO_DISTRIBUTION_EXEC: $FREEBSD_EXEC
@@ -231,13 +231,13 @@ fedora:43@container-clean:
     FDO_DISTRIBUTION_VERSION: '43'
     FDO_DISTRIBUTION_TAG: $FEDORA_TAG
 
-freebsd:14.3@container-clean:
+freebsd:14.4@container-clean:
   extends:
     - .container-clean
   variables:
     GIT_STRATEGY: none
     CURRENT_CONTAINER_IMAGE: $CI_REGISTRY_IMAGE/freebsd/$FDO_DISTRIBUTION_VERSION:$FDO_DISTRIBUTION_TAG
-    FDO_DISTRIBUTION_VERSION: '14.3'
+    FDO_DISTRIBUTION_VERSION: '14.4'
     FDO_DISTRIBUTION_TAG: $FREEBSD_TAG
 
 msys2:latest@container-clean:
@@ -709,7 +709,7 @@ t_fedora:rawhide:android aarch64:
     FC_BUILD_NO_CHECK: 1
 
 
-t_freebsd:14.3:standard build:
+t_freebsd:14.4:standard build:
   stage: distro
   extends:
     - .build-in-qemu@template
@@ -717,7 +717,7 @@ t_freebsd:14.3:standard build:
     - .fc_artifacts
   variables:
     FC_DISTRO_NAME: freebsd
-    FDO_DISTRIBUTION_VERSION: '14.3'
+    FDO_DISTRIBUTION_VERSION: '14.4'
     FDO_DISTRIBUTION_TAG: $FREEBSD_TAG
     FC_BUILDSYS: meson
     FC_BUILD_TYPE: shared
