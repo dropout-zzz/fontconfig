@@ -198,18 +198,18 @@ main (void)
     mkdir_p (basedir);
     setenv ("HOME", basedir, 1);
     retval++;
-    s = FcStrBuildFilename (basedir, ".fonts.conf", NULL);
+    s = FcStrBuildFilename ((const FcChar8 *)basedir, ".fonts.conf", NULL);
     if (!s)
 	goto bail;
     retval++;
     fprintf (stderr, "D: Creating %s\n", s);
-    if ((fp = fopen (s, "wb")) == NULL)
+    if ((fp = fopen ((const char *)s, "wb")) == NULL)
 	goto bail;
     fprintf (fp, "%s", s);
     fclose (fp);
     retval++;
     fprintf (stderr, "D: Checking file path\n");
-    ret = FcConfigRealFilename (cfg, "~/.fonts.conf");
+    ret = FcConfigRealFilename (cfg, (FcChar8 *)"~/.fonts.conf");
     if (!ret)
 	goto bail;
     retval++;
@@ -223,22 +223,22 @@ main (void)
     fprintf (stderr, "D: Creating %s\n", sysroot);
     mkdir_p (sysroot);
     retval++;
-    d = FcStrBuildFilename (sysroot, basedir, NULL);
+    d = FcStrBuildFilename ((const FcChar8 *)sysroot, basedir, NULL);
     fprintf (stderr, "D: Creating %s\n", d);
-    mkdir_p (d);
+    mkdir_p ((const char *)d);
     free (d);
-    s = FcStrBuildFilename (sysroot, basedir, ".fonts.conf", NULL);
+    s = FcStrBuildFilename ((const FcChar8 *)sysroot, basedir, ".fonts.conf", NULL);
     if (!s)
 	goto bail;
     retval++;
     fprintf (stderr, "D: Creating %s\n", s);
-    if ((fp = fopen (s, "wb")) == NULL)
+    if ((fp = fopen ((const char *)s, "wb")) == NULL)
 	goto bail;
     fprintf (fp, "%s", s);
     fclose (fp);
     retval++;
     fprintf (stderr, "D: Checking file path\n");
-    ret = FcConfigRealFilename (cfg, "~/.fonts.conf");
+    ret = FcConfigRealFilename (cfg, (FcChar8 *)"~/.fonts.conf");
     if (!ret)
 	goto bail;
     retval++;

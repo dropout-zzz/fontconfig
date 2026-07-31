@@ -1,4 +1,4 @@
-.default_tag: &default_tag "2026-07-29.0"
+.default_tag: &default_tag "2026-07-31.0"
 
 build_patterns:
   - name: "autotools shared expat"
@@ -7,49 +7,26 @@ build_patterns:
       FC_BUILD_TYPE: shared
       FC_XML_BACKEND: expat
       FC_BUILD_DISABLED: docs
-  - name: "autotools shared libxml2"
-    variables:
-      FC_BUILDSYS: autotools
-      FC_BUILD_TYPE: shared
-      FC_XML_BACKEND: libxml2
-      FC_BUILD_DISABLED: docs
-  - name: "autotools static expat"
-    variables:
-      FC_BUILDSYS: autotools
-      FC_BUILD_TYPE: static
-      FC_XML_BACKEND: expat
-      FC_BUILD_DISABLED: docs
-  - name: "autotools static libxml2"
-    variables:
-      FC_BUILDSYS: autotools
-      FC_BUILD_TYPE: static
-      FC_XML_BACKEND: libxml2
-      FC_BUILD_DISABLED: docs
   - name: "meson shared expat"
     variables:
       FC_BUILDSYS: meson
       FC_BUILD_TYPE: shared
       FC_XML_BACKEND: expat
+      FC_TEST_EXEC: cache-compat
+      FC_BASELINE_TAG: ""
   - name: "meson shared libxml2"
     variables:
       FC_BUILDSYS: meson
       FC_BUILD_TYPE: shared
       FC_XML_BACKEND: libxml2
-  - name: "meson static expat"
-    variables:
-      FC_BUILDSYS: meson
-      FC_BUILD_TYPE: static
-      FC_XML_BACKEND: expat
-  - name: "meson static libxml2"
+      FC_TEST_EXEC: meson-install-shared
+  - name: "meson static libxml2 fontations"
     variables:
       FC_BUILDSYS: meson
       FC_BUILD_TYPE: static
       FC_XML_BACKEND: libxml2
-  - name: "meson static fontations"
-    variables:
-      FC_BUILDSYS: meson
-      FC_BUILD_TYPE: static
       FC_BUILD_ENABLED: "fontations"
+      FC_TEST_EXEC: meson-install-static
 
 test_patterns:
   - name: "subproject-build shared"
@@ -62,19 +39,11 @@ test_patterns:
       FC_BUILDSYS: meson
       FC_BUILD_TYPE: static
       FC_BUILD_SUBPROJECT: 1
-  - name: "meson-install-shared"
-    parent: "meson shared libxml2"
-  - name: "meson-install-static"
-    parent: "meson static libxml2"
   - name: "ASAN/UBSAN"
     variables:
       FC_BUILDSYS: meson
       FC_BUILD_TYPE: shared
       FC_BUILD_ASAN: address,undefined
-  - name: "cache-compat"
-    parent: "meson shared expat"
-    variables:
-      FC_BASELINE_TAG: ""
 
 distributions:
   - name: alpine
@@ -129,7 +98,7 @@ distributions:
     base_type: freebsd
     qemu_based: true
     versions:
-      - "14.3"
+      - "14.4"
     builds:
       - name: "standard build"
         variables:
