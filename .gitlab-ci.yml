@@ -48,10 +48,10 @@ variables:
 # changing these will force rebuilding the associated image
 # Note: these tags have no meaning and are not tied to a particular
 # fontconfig version
-  ALPINE_TAG:    '2026-07-29.0-271373fb3186'
-  FEDORA_TAG:    '2026-07-29.0-931c43184912'
-  FREEBSD_TAG:   '2026-07-29.0-79e636a004d9'
-  MSYS2_TAG:     '2026-07-29.0-7fb34bd25ffe'
+  ALPINE_TAG:    '2026-07-29.0-87560b1bc378'
+  FEDORA_TAG:    '2026-07-29.0-43004307e83a'
+  FREEBSD_TAG:   '2026-07-29.0-e91d5ee4ed69'
+  MSYS2_TAG:     '2026-07-29.0-47ddce642f40'
 
   ALPINE_EXEC:   'bash .gitlab-ci/alpine-install.sh'
   FEDORA_EXEC:   'bash .gitlab-ci/fedora-install.sh'
@@ -436,54 +436,6 @@ build-autotools shared expat:
     FC_BUILD_DISABLED: docs
   needs:
     - fedora:rawhide@container-prep
-build-autotools shared libxml2:
-  stage: build
-  extends:
-    - .build@template
-    - .fdo.distribution-image@fedora
-    - .fc_artifacts
-  variables:
-    FC_DISTRO_NAME: fedora
-    FDO_DISTRIBUTION_VERSION: rawhide
-    FDO_DISTRIBUTION_TAG: $FEDORA_TAG
-    FC_BUILDSYS: autotools
-    FC_BUILD_TYPE: shared
-    FC_XML_BACKEND: libxml2
-    FC_BUILD_DISABLED: docs
-  needs:
-    - fedora:rawhide@container-prep
-build-autotools static expat:
-  stage: build
-  extends:
-    - .build@template
-    - .fdo.distribution-image@fedora
-    - .fc_artifacts
-  variables:
-    FC_DISTRO_NAME: fedora
-    FDO_DISTRIBUTION_VERSION: rawhide
-    FDO_DISTRIBUTION_TAG: $FEDORA_TAG
-    FC_BUILDSYS: autotools
-    FC_BUILD_TYPE: static
-    FC_XML_BACKEND: expat
-    FC_BUILD_DISABLED: docs
-  needs:
-    - fedora:rawhide@container-prep
-build-autotools static libxml2:
-  stage: build
-  extends:
-    - .build@template
-    - .fdo.distribution-image@fedora
-    - .fc_artifacts
-  variables:
-    FC_DISTRO_NAME: fedora
-    FDO_DISTRIBUTION_VERSION: rawhide
-    FDO_DISTRIBUTION_TAG: $FEDORA_TAG
-    FC_BUILDSYS: autotools
-    FC_BUILD_TYPE: static
-    FC_XML_BACKEND: libxml2
-    FC_BUILD_DISABLED: docs
-  needs:
-    - fedora:rawhide@container-prep
 build-meson shared expat:
   stage: build
   extends:
@@ -514,22 +466,7 @@ build-meson shared libxml2:
     FC_XML_BACKEND: libxml2
   needs:
     - fedora:rawhide@container-prep
-build-meson static expat:
-  stage: build
-  extends:
-    - .build@template
-    - .fdo.distribution-image@fedora
-    - .fc_artifacts
-  variables:
-    FC_DISTRO_NAME: fedora
-    FDO_DISTRIBUTION_VERSION: rawhide
-    FDO_DISTRIBUTION_TAG: $FEDORA_TAG
-    FC_BUILDSYS: meson
-    FC_BUILD_TYPE: static
-    FC_XML_BACKEND: expat
-  needs:
-    - fedora:rawhide@container-prep
-build-meson static libxml2:
+build-meson static libxml2 fontations:
   stage: build
   extends:
     - .build@template
@@ -542,20 +479,6 @@ build-meson static libxml2:
     FC_BUILDSYS: meson
     FC_BUILD_TYPE: static
     FC_XML_BACKEND: libxml2
-  needs:
-    - fedora:rawhide@container-prep
-build-meson static fontations:
-  stage: build
-  extends:
-    - .build@template
-    - .fdo.distribution-image@fedora
-    - .fc_artifacts
-  variables:
-    FC_DISTRO_NAME: fedora
-    FDO_DISTRIBUTION_VERSION: rawhide
-    FDO_DISTRIBUTION_TAG: $FEDORA_TAG
-    FC_BUILDSYS: meson
-    FC_BUILD_TYPE: static
     FC_BUILD_ENABLED: fontations
   needs:
     - fedora:rawhide@container-prep
@@ -655,7 +578,7 @@ meson-install-static:
     FC_TEST_EXEC: meson-install-static
   needs:
     - fedora:rawhide@container-prep
-    - build-meson static libxml2
+    - build-meson static libxml2 fontations
 ASAN/UBSAN:
   stage: test
   extends:

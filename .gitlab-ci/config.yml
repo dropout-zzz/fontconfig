@@ -7,24 +7,6 @@ build_patterns:
       FC_BUILD_TYPE: shared
       FC_XML_BACKEND: expat
       FC_BUILD_DISABLED: docs
-  - name: "autotools shared libxml2"
-    variables:
-      FC_BUILDSYS: autotools
-      FC_BUILD_TYPE: shared
-      FC_XML_BACKEND: libxml2
-      FC_BUILD_DISABLED: docs
-  - name: "autotools static expat"
-    variables:
-      FC_BUILDSYS: autotools
-      FC_BUILD_TYPE: static
-      FC_XML_BACKEND: expat
-      FC_BUILD_DISABLED: docs
-  - name: "autotools static libxml2"
-    variables:
-      FC_BUILDSYS: autotools
-      FC_BUILD_TYPE: static
-      FC_XML_BACKEND: libxml2
-      FC_BUILD_DISABLED: docs
   - name: "meson shared expat"
     variables:
       FC_BUILDSYS: meson
@@ -35,20 +17,11 @@ build_patterns:
       FC_BUILDSYS: meson
       FC_BUILD_TYPE: shared
       FC_XML_BACKEND: libxml2
-  - name: "meson static expat"
-    variables:
-      FC_BUILDSYS: meson
-      FC_BUILD_TYPE: static
-      FC_XML_BACKEND: expat
-  - name: "meson static libxml2"
+  - name: "meson static libxml2 fontations"
     variables:
       FC_BUILDSYS: meson
       FC_BUILD_TYPE: static
       FC_XML_BACKEND: libxml2
-  - name: "meson static fontations"
-    variables:
-      FC_BUILDSYS: meson
-      FC_BUILD_TYPE: static
       FC_BUILD_ENABLED: "fontations"
 
 test_patterns:
@@ -65,7 +38,7 @@ test_patterns:
   - name: "meson-install-shared"
     parent: "meson shared libxml2"
   - name: "meson-install-static"
-    parent: "meson static libxml2"
+    parent: "meson static libxml2 fontations"
   - name: "ASAN/UBSAN"
     variables:
       FC_BUILDSYS: meson
