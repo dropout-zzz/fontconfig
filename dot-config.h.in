@@ -1,0 +1,10 @@
+#ifndef DROPOUT_CONFIG_H
+#define DROPOUT_CONFIG_H
+
+#cmakedefine01 HAVE_VASPRINTF_L
+#cmakedefine01 HAVE__VSNPRINTF_L
+#cmakedefine01 HAVE_VASPRINTF
+#cmakedefine01 HAVE_C99_VSNPRINTF
+#cmakedefine01 HAVE_VSNPRINTF
+
+#endif /* DROPOUT_CONFIG_H */

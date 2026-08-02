@@ -1,16 +1,29 @@
 cmake_minimum_required(VERSION 4.2.0)
 project(fontconfig LANGUAGES C)
 
+set(CMAKE_C_STANDARD 11)
+
 # we need for generating headers
 find_package(Python3 COMPONENTS Interpreter REQUIRED)
 
 find_package(EXPAT REQUIRED)
 find_package(Freetype REQUIRED)
 
-try_compile(CC_TEST_FAM SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/meson-cc-tests/flexible-array-member-test.c)
+set(DOT_TESTS ${CMAKE_CURRENT_SOURCE_DIR}/meson-cc-tests)
+try_compile(CC_TEST_FAM SOURCES ${DOT_TESTS}/flexible-array-member-test.c)
+
+include(CheckSymbolExists)
+
+check_symbol_exists(vasprintf_l "stdio.h;stdarg.h;xlocale.h" HAVE_VASPRINTF_L)
+check_symbol_exists(_vsnprintf_l "stdio.h" HAVE__VSNPRINTF_L)
+check_symbol_exists(vasprintf "stdio.h;stdarg.h" HAVE_VASPRINTF)
+try_compile(HAVE_C99_VSNPRINTF SOURCES ${DOT_TESTS}/c99-vsnprint-test.c)
+check_symbol_exists(vsnprintf "stdio.h;stdarg.h" HAVE_VSNPRINTF)
 
 ###
 set(DOT_GEN_H ${CMAKE_CURRENT_BINARY_DIR}/dot_gen_h)
+
+configure_file(dot-config.h.in ${DOT_GEN_H}/config.h)
 
 configure_file(src/fcstdint.h.in ${DOT_GEN_H}/fcstdint.h COPYONLY)
 ##
@@ -47,7 +60,8 @@ add_custom_command(
 add_custom_target(dropout_generated_headers DEPENDS
   ${DOT_GEN_H}/fcstdint.h
   ${DOT_FC_H}
-  ${DOT_ALIAS_H})
+  ${DOT_ALIAS_H}
+  ${DOT_GEN_H}/config.h)
 ###
 
 add_library(fontconfig SHARED
@@ -61,6 +75,7 @@ if(CC_TEST_FAM)
 else()
   target_compile_definitions(fontconfig PRIVATE FLEXIBLE_ARRAY_MEMBER=1)
 endif()
+target_compile_definitions(fontconfig PRIVATE -DHAVE_CONFIG_H)
 add_dependencies(fontconfig
   dropout_generated_headers)
 target_include_directories(fontconfig PRIVATE
