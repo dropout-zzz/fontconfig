@@ -30,3 +30,4 @@ test-driver
 /prefix*
 /subprojects/*/
 /target*
+dot_gen_h/
