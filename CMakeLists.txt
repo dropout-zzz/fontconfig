@@ -7,6 +7,8 @@ find_package(Python3 COMPONENTS Interpreter REQUIRED)
 find_package(EXPAT REQUIRED)
 find_package(Freetype REQUIRED)
 
+try_compile(CC_TEST_FAM SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/meson-cc-tests/flexible-array-member-test.c)
+
 ###
 set(DOT_GEN_H ${CMAKE_CURRENT_BINARY_DIR}/dot_gen_h)
 
@@ -54,6 +56,11 @@ add_library(fontconfig SHARED
   src/fcdefault.c
   src/fcpat.c
   src/fcmatch.c)
+if(CC_TEST_FAM)
+  target_compile_definitions(fontconfig PRIVATE -DFLEXIBLE_ARRAY_MEMBER)
+else()
+  target_compile_definitions(fontconfig PRIVATE FLEXIBLE_ARRAY_MEMBER=1)
+endif()
 add_dependencies(fontconfig
   dropout_generated_headers)
 target_include_directories(fontconfig PRIVATE
