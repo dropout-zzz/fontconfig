@@ -31,3 +31,4 @@ test-driver
 /subprojects/*/
 /target*
 dot_gen_h/
+dropout/

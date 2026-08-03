@@ -198,6 +198,50 @@ add_custom_command(
   DEPENDS Python3::Interpreter ${DOT_FCCONST}/fc-const.py ${DOT_FCCONST}/fcconst.list ${DOT_SRC}/fcobjs.h
 )
 ###
+function(ADD_C_PREPROCESSOR_COMMAND DOT_INPUT DOT_OUTPUT DOT_DEPS DOT_INCS)
+  # FIXME: still very limited. for example, no auto header dependency resolution, etc.
+  #        luckily, use cases in building fontconfig is currently trivial.
+  if(MSVC)
+    list(TRANSFORM DOT_INCS PREPEND /I)
+    add_custom_command(
+      OUTPUT ${DOT_OUTPUT}
+      COMMAND ${CMAKE_C_COMPILER} ${DOT_INCS} /EP /P /Fi${DOT_OUTPUT} ${DOT_INPUT}
+      DEPENDS ${DOT_DEPS} ${DOT_INPUT}
+    )
+  else()
+    list(TRANSFORM DOT_INCS PREPEND -I)
+    add_custom_command(
+      OUTPUT ${DOT_OUTPUT}
+      COMMAND ${CMAKE_C_COMPILER} ${DOT_INCS} -E -P -o ${DOT_OUTPUT} ${DOT_INPUT}
+      DEPENDS ${DOT_DEPS} ${DOT_INPUT}
+    )
+  endif()
+endfunction()
+
+set(DOT_DIR ${CMAKE_CURRENT_BINARY_DIR}/dropout)
+add_custom_target(dropout_dir COMMAND ${CMAKE_COMMAND} -E make_directory ${DOT_DIR})
+
+ADD_C_PREPROCESSOR_COMMAND(
+  ${DOT_SRC}/fcobjshash.gperf.h  # IN
+  ${DOT_DIR}/fcobjshash.gperf.i  # OUT
+  "dropout_dir;${DOT_FC_H};${DOT_SRC}/fcobjs.h"  # DEPS
+  "${DOT_GEN_H}"  # INCS
+)
+
+add_custom_command(
+  OUTPUT ${DOT_DIR}/fcobjshash.gperf
+  COMMAND ${Python3_EXECUTABLE} ${DOT_SRC}/cutout.py fcobjshash.gperf.i fcobjshash.gperf
+  WORKING_DIRECTORY ${DOT_DIR}
+  DEPENDS Python3::Interpreter ${DOT_SRC}/cutout.py ${DOT_DIR}/fcobjshash.gperf.i
+)
+
+add_custom_command(
+  OUTPUT ${DOT_GEN_H}/fcobjshash.h
+  COMMAND ${CMAKE_COMMAND} -E make_directory ${DOT_GEN_H}
+  COMMAND ${GPERF_EXECUTABLE} --pic -m 100 ${DOT_DIR}/fcobjshash.gperf --output-file ${DOT_GEN_H}/fcobjshash.h
+  DEPENDS ${GPERF_EXECUTABLE} ${DOT_DIR}/fcobjshash.gperf
+)
+###
 
 add_custom_target(dropout_generated_headers DEPENDS
   ${DOT_GEN_H}/fcstdint.h
@@ -205,7 +249,8 @@ add_custom_target(dropout_generated_headers DEPENDS
   ${DOT_ALIAS_H}
   ${DOT_GEN_H}/config.h
   ${DOT_GEN_H}/fclang.h
-  ${DOT_GEN_H}/fcconst.h)
+  ${DOT_GEN_H}/fcconst.h
+  ${DOT_GEN_H}/fcobjshash.h)
 
 add_library(fontconfig SHARED
   src/fcobjs.c
