@@ -138,13 +138,24 @@ add_custom_command(
   DEPENDS Python3::Interpreter ${DOT_FCLANG}/fc-lang.py ${DOT_FCLANG}/fclang.tmpl.h ${ORTH_FILES}
 )
 ###
+set(DOT_FCCONST ${CMAKE_CURRENT_SOURCE_DIR}/fc-const)
+
+add_custom_command(
+  OUTPUT ${DOT_GEN_H}/fcconst.h
+  COMMAND ${CMAKE_COMMAND} -E make_directory ${DOT_GEN_H}
+  COMMAND ${Python3_EXECUTABLE} fc-const.py fcconst.list ${DOT_SRC}/fcobjs.h -o ${DOT_GEN_H}/fcconst.h
+  WORKING_DIRECTORY ${DOT_FCCONST}
+  DEPENDS Python3::Interpreter ${DOT_FCCONST}/fc-const.py ${DOT_FCCONST}/fcconst.list ${DOT_SRC}/fcobjs.h
+)
+###
 
 add_custom_target(dropout_generated_headers DEPENDS
   ${DOT_GEN_H}/fcstdint.h
   ${DOT_FC_H}
   ${DOT_ALIAS_H}
   ${DOT_GEN_H}/config.h
-  ${DOT_GEN_H}/fclang.h)
+  ${DOT_GEN_H}/fclang.h
+  ${DOT_GEN_H}/fcconst.h)
 
 add_library(fontconfig SHARED
   src/fcname.c
