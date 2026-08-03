@@ -1,5 +1,6 @@
 cmake_minimum_required(VERSION 4.2.0)
-project(fontconfig LANGUAGES C)
+# update version when changed.
+project(fontconfig LANGUAGES C VERSION 2.18.2)
 
 set(CMAKE_C_STANDARD 11)
 

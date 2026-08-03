@@ -21,4 +21,8 @@
 
 #cmakedefine HAVE_UNISTD_H
 
+#define FC_VERSION_MAJOR @fontconfig_VERSION_MAJOR@
+#define FC_VERSION_MINOR @fontconfig_VERSION_MINOR@
+#define FC_VERSION_MICRO @fontconfig_VERSION_PATCH@
+
 #endif /* DROPOUT_CONFIG_H */
