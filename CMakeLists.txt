@@ -179,6 +179,7 @@ add_custom_target(dropout_generated_headers DEPENDS
   ${DOT_GEN_H}/fcconst.h)
 
 add_library(fontconfig SHARED
+  src/fcobjs.c
   src/fcname.c
   src/fcstat.c
   src/fccache.c
