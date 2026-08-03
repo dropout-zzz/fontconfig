@@ -7,4 +7,8 @@
 #cmakedefine01 HAVE_C99_VSNPRINTF
 #cmakedefine01 HAVE_VSNPRINTF
 
+#cmakedefine HAVE_STDATOMIC_PRIMITIVES
+#cmakedefine HAVE_INTEL_ATOMIC_PRIMITIVES
+#cmakedefine HAVE_SOLARIS_ATOMIC_OPS
+
 #endif /* DROPOUT_CONFIG_H */

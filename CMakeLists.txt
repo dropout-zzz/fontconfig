@@ -20,6 +20,10 @@ check_symbol_exists(vasprintf "stdio.h;stdarg.h" HAVE_VASPRINTF)
 try_compile(HAVE_C99_VSNPRINTF SOURCES ${DOT_TESTS}/c99-vsnprint-test.c)
 check_symbol_exists(vsnprintf "stdio.h;stdarg.h" HAVE_VSNPRINTF)
 
+try_compile(HAVE_STDATOMIC_PRIMITIVES SOURCES ${DOT_TESTS}/stdatomic-primitives-test.c)
+try_compile(HAVE_INTEL_ATOMIC_PRIMITIVES SOURCES ${DOT_TESTS}/intel-atomic-primitives-test.c)
+try_compile(HAVE_SOLARIS_ATOMIC_OPS SOURCES ${DOT_TESTS}/solaris-atomic-operations.c)
+
 ###
 set(DOT_GEN_H ${CMAKE_CURRENT_BINARY_DIR}/dot_gen_h)
 
