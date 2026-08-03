@@ -147,12 +147,15 @@ add_custom_target(dropout_generated_headers DEPENDS
   ${DOT_GEN_H}/fclang.h)
 
 add_library(fontconfig SHARED
+  src/fcname.c
+  src/fcstat.c
   src/fccache.c
   src/fcinit.c
   src/fccfg.c
   src/fcdefault.c
   src/fcpat.c
-  src/fcmatch.c)
+  src/fcmatch.c
+  src/fcdbg.c)
 if(CC_TEST_FAM)
   target_compile_definitions(fontconfig PRIVATE -DFLEXIBLE_ARRAY_MEMBER)
 else()
