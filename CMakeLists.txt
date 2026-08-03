@@ -3,6 +3,26 @@ project(fontconfig LANGUAGES C)
 
 set(CMAKE_C_STANDARD 11)
 
+include(GNUInstallDirs)
+
+if(WIN32)
+  set(CACHE{FC_CACHEDIR} HELP "Default font cache location" VALUE "LOCAL_APPDATA_FONTCONFIG_CACHE")
+else()
+  set(CACHE{FC_CACHEDIR} HELP "Default font cache location" VALUE "${CMAKE_INSTALL_FULL_LOCALSTATEDIR}/cache/${PROJECT_NAME}")
+endif()
+set(CACHE{FC_TEMPLATEDIR} HELP "Location of configuration templates" VALUE "${CMAKE_INSTALL_FULL_DATAROOTDIR}/fontconfig/conf.avail")
+if(WIN32)
+  set(CACHE{DFLT_FONT_DIRS} HELP "Default system font directories" VALUE "WINDOWSFONTDIR" "WINDOWSUSERFONTDIR")
+elseif(APPLE)
+  set(CACHE{DFLT_FONT_DIRS} HELP "Default system font directories" VALUE "/System/Library/Fonts" "/Library/Fonts" "~/Library/Fonts" "/System/Library/Assets" "/System/Library/AssetsV2")
+elseif(ANDROID)
+  set(CACHE{DFLT_FONT_DIRS} HELP "Default system font directories" VALUE "/system/fonts/" "/product/fonts/")
+else()
+  set(CACHE{DFLT_FONT_DIRS} HELP "Default system font directories" VALUE "/usr/share/fonts" "/usr/local/share/fonts")
+endif()
+set(CACHE{FC_BASECONFIGDIR} HELP "Default base configuration directory" VALUE "${CMAKE_INSTALL_FULL_SYSCONFDIR}/fonts")
+set(CACHE{FC_CONFIGDIR} HELP "Default configuration directory" VALUE "${FC_BASECONFIGDIR}/conf.d")
+
 # we need for generating headers
 find_package(Python3 COMPONENTS Interpreter REQUIRED)
 
@@ -27,9 +47,16 @@ try_compile(HAVE_SOLARIS_ATOMIC_OPS SOURCES ${DOT_TESTS}/solaris-atomic-operatio
 ###
 set(DOT_GEN_H ${CMAKE_CURRENT_BINARY_DIR}/dot_gen_h)
 
-configure_file(dot-config.h.in ${DOT_GEN_H}/config.h)
+list(JOIN DFLT_FONT_DIRS "</dir> <dir>" FC_DEFAULT_FONTS)
+if(NOT FC_DEFAULT_FONTS STREQUAL "")
+  string(PREPEND FC_DEFAULT_FONTS "<dir>")
+  string(APPEND FC_DEFAULT_FONTS "</dir>")
+endif()
 
+configure_file(dot-config.h.in ${DOT_GEN_H}/config.h)
+###
 include(CheckCSourceCompiles)
+
 foreach(STDINT_TYPE uint64_t int32_t uintptr_t intptr_t)
   check_c_source_compiles("
     #include <stdint.h>
@@ -39,6 +66,7 @@ foreach(STDINT_TYPE uint64_t int32_t uintptr_t intptr_t)
     message(FATAL_ERROR "cannot use type ${STDINT_TYPE}")
   endif()
 endforeach()
+
 configure_file(src/fcstdint.h.in ${DOT_GEN_H}/fcstdint.h COPYONLY)
 ##
 set(DOT_FC_H ${DOT_GEN_H}/fontconfig/fontconfig.h)
