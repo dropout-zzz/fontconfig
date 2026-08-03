@@ -63,7 +63,8 @@ set(DOT_ALIAS_IN
 add_custom_command(
   OUTPUT ${DOT_ALIAS_H}
   COMMAND ${CMAKE_COMMAND} -E make_directory ${DOT_GEN_H}
-  COMMAND ${Python3_EXECUTABLE} ${DOT_SRC}/makealias.py ${DOT_SRC} ${DOT_ALIAS_H} ${DOT_ALIAS_IN}
+  COMMAND ${Python3_EXECUTABLE} makealias.py . ${DOT_ALIAS_H} ${DOT_ALIAS_IN}
+  WORKING_DIRECTORY ${DOT_SRC}
   DEPENDS Python3::Interpreter ${DOT_SRC}/makealias.py ${DOT_ALIAS_IN}
 )
 ###
