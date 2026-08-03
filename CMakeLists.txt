@@ -252,7 +252,24 @@ add_custom_target(dropout_generated_headers DEPENDS
   ${DOT_GEN_H}/fcconst.h
   ${DOT_GEN_H}/fcobjshash.h)
 
+function(DOT_FIXUP_SRC DOT_ID DOT_PATH DOT_NEW DOT_PAT DOT_SUB)
+  add_custom_target(prepare_${DOT_ID}_source ALL
+    BYPRODUCTS ${DOT_NEW}
+    COMMAND ${CMAKE_COMMAND} -E copy_if_newer ${DOT_PATH} ${DOT_NEW}
+    COMMAND ${CMAKE_COMMAND} -DDOT_FILE=${DOT_NEW} -DDOT_A=${DOT_PAT} -DDOT_B=${DOT_SUB} -P ${CMAKE_CURRENT_SOURCE_DIR}/dot_fixup_src.cmake
+    DEPENDS dropout_dir)
+endfunction()
+
+DOT_FIXUP_SRC(
+  fcstr  # PRETTY
+  ${DOT_SRC}/fcstr.c  # SRC
+  ${DOT_DIR}/fcstr.c  # DST
+  "../fc-case/fccase.h"  # SEARCH
+  "fccase.h"  # REPLACE
+)
+
 add_library(fontconfig SHARED
+  ${DOT_DIR}/fcstr.c
   src/fcobjs.c
   src/fcname.c
   src/fcstat.c
@@ -272,7 +289,8 @@ target_compile_definitions(fontconfig PRIVATE -DHAVE_CONFIG_H)
 add_dependencies(fontconfig
   dropout_generated_headers)
 target_include_directories(fontconfig PRIVATE
-  ${DOT_GEN_H})
+  ${DOT_GEN_H}
+  src)
 target_link_libraries(fontconfig PRIVATE
   EXPAT::EXPAT
   Freetype::Freetype)
