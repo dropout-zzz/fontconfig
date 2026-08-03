@@ -144,6 +144,7 @@ add_custom_target(dropout_generated_headers DEPENDS
   ${DOT_GEN_H}/fclang.h)
 
 add_library(fontconfig SHARED
+  src/fccache.c
   src/fcinit.c
   src/fccfg.c
   src/fcdefault.c
