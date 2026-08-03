@@ -32,6 +32,9 @@ find_package(Freetype REQUIRED)
 set(DOT_TESTS ${CMAKE_CURRENT_SOURCE_DIR}/meson-cc-tests)
 try_compile(CC_TEST_FAM SOURCES ${DOT_TESTS}/flexible-array-member-test.c)
 
+include(CheckTypeSize)
+check_type_size("void *" SIZEOF_VOID_P BUILTIN_TYPES_ONLY)
+
 include(CheckSymbolExists)
 
 check_symbol_exists(vasprintf_l "stdio.h;stdarg.h;xlocale.h" HAVE_VASPRINTF_L)
