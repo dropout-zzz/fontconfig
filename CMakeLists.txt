@@ -25,6 +25,16 @@ set(DOT_GEN_H ${CMAKE_CURRENT_BINARY_DIR}/dot_gen_h)
 
 configure_file(dot-config.h.in ${DOT_GEN_H}/config.h)
 
+include(CheckCSourceCompiles)
+foreach(STDINT_TYPE uint64_t int32_t uintptr_t intptr_t)
+  check_c_source_compiles("
+    #include <stdint.h>
+    int main(void) { ${STDINT_TYPE} a = 123; (void)a; return 0; }
+  " CC_TEST_${STDINT_TYPE})
+  if(NOT CC_TEST_${STDINT_TYPE})
+    message(FATAL_ERROR "cannot use type ${STDINT_TYPE}")
+  endif()
+endforeach()
 configure_file(src/fcstdint.h.in ${DOT_GEN_H}/fcstdint.h COPYONLY)
 ##
 set(DOT_FC_H ${DOT_GEN_H}/fontconfig/fontconfig.h)
