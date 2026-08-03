@@ -20,6 +20,7 @@
 #define SIZEOF_VOID_P @SIZEOF_VOID_P@
 
 #cmakedefine HAVE_UNISTD_H
+#cmakedefine HAVE_DIRENT_H
 
 #define FC_VERSION_MAJOR @fontconfig_VERSION_MAJOR@
 #define FC_VERSION_MINOR @fontconfig_VERSION_MINOR@

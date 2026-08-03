@@ -37,7 +37,9 @@ include(CheckTypeSize)
 check_type_size("void *" SIZEOF_VOID_P BUILTIN_TYPES_ONLY)
 
 include(CheckIncludeFile)
+
 check_include_file("unistd.h" HAVE_UNISTD_H)
+check_include_file("dirent.h" HAVE_DIRENT_H)
 
 include(CheckSymbolExists)
 
