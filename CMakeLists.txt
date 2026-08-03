@@ -36,6 +36,27 @@ try_compile(CC_TEST_FAM SOURCES ${DOT_TESTS}/flexible-array-member-test.c)
 include(CheckTypeSize)
 check_type_size("void *" SIZEOF_VOID_P BUILTIN_TYPES_ONLY)
 
+function(CHECK_C_TYPE_ALIGN DOT_C_TYPE DOT_RESVAR)
+  try_run(${DOT_RESVAR}_CC_TEST ${DOT_RESVAR}_CC_COMPILES SOURCE_FROM_CONTENT cc-test.c "
+    #include <stddef.h>
+    #include <stdio.h>
+    typedef struct { char x; ${DOT_C_TYPE} y; } foo;
+    int main(void) { printf(\"%d\", (int)offsetof(foo, y)); return 0; }
+  " RUN_OUTPUT_STDOUT_VARIABLE TEST_OUTPUT)
+
+  if(NOT ${DOT_RESVAR}_CC_COMPILES)
+    message(FATAL_ERROR "can't compile test to determine alignment of ${DOT_C_TYPE}")
+  endif()
+
+  if(NOT ${DOT_RESVAR}_CC_TEST EQUAL 0)
+    message(FATAL_ERROR "can't complete test to determine alignment of ${DOT_C_TYPE}")
+  endif()
+
+  set(${DOT_RESVAR} "${TEST_OUTPUT}" PARENT_SCOPE)
+endfunction()
+
+CHECK_C_TYPE_ALIGN("void *" ALIGNOF_VOID_P)
+
 include(CheckIncludeFile)
 
 check_include_file("unistd.h" HAVE_UNISTD_H)
