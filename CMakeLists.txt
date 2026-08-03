@@ -35,6 +35,9 @@ try_compile(CC_TEST_FAM SOURCES ${DOT_TESTS}/flexible-array-member-test.c)
 include(CheckTypeSize)
 check_type_size("void *" SIZEOF_VOID_P BUILTIN_TYPES_ONLY)
 
+include(CheckIncludeFile)
+check_include_file("unistd.h" HAVE_UNISTD_H)
+
 include(CheckSymbolExists)
 
 check_symbol_exists(vasprintf_l "stdio.h;stdarg.h;xlocale.h" HAVE_VASPRINTF_L)

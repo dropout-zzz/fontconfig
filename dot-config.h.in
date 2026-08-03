@@ -19,4 +19,6 @@
 
 #define SIZEOF_VOID_P @SIZEOF_VOID_P@
 
+#cmakedefine HAVE_UNISTD_H
+
 #endif /* DROPOUT_CONFIG_H */
