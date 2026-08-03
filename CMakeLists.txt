@@ -66,13 +66,43 @@ add_custom_command(
   COMMAND ${Python3_EXECUTABLE} ${DOT_SRC}/makealias.py ${DOT_SRC} ${DOT_ALIAS_H} ${DOT_ALIAS_IN}
   DEPENDS Python3::Interpreter ${DOT_SRC}/makealias.py ${DOT_ALIAS_IN}
 )
+###
+set(ORTH_NAMES
+  aa ab af am ar as ast av ay az_az az_ir ba bm be bg bh bho bi bin bn bo br bs
+  bua ca ce ch chm chr co cs cu cv cy da de dz el en eo es et eu fa fi fj fo fr
+  ff fur fy ga gd gez gl gn gu gv ha haw he hi ho hr hu hy ia ig id ie ik io is
+  it iu ja ka kaa ki kk kl km kn ko kok ks ku_am ku_ir kum kv kw ky la lb lez ln
+  lo lt lv mg mh mi mk ml mn_cn mo mr mt my nb nds ne nl nn no nr nso ny oc om
+  or os pa pl ps_af ps_pk pt rm ro ru sa sah sco se sel sh shs si sk sl sm sma
+  smj smn sms so sq sr ss st sv sw syr ta te tg th ti_er ti_et tig tk tl tn to
+  tr ts tt tw tyv ug uk ur uz ve vi vo vot wa wen wo xh yap yi yo zh_cn zh_hk
+  zh_mo zh_sg zh_tw zu ak an ber_dz ber_ma byn crh csb dv ee fat fil hne hsb ht
+  hz ii jv kab kj kr ku_iq ku_tr kwm lg li mai mn_mn ms na ng nv ota pa_pk pap_an
+  pap_aw qu quz rn rw sc sd sg sid sn su ty wal za lah nqo brx sat doi mni und_zsye
+  und_zmth anp bhb hif mag raj the agr ayc bem ckb cmn dsb hak lij lzh mfe mhr
+  miq mjw mnw nan nhn niu rif sgs shn szl tcy tpi unm wae yue yuw got cop suz)
+# sync the above list.
+
+list(TRANSFORM ORTH_NAMES APPEND .orth)
+
+set(DOT_FCLANG ${CMAKE_CURRENT_SOURCE_DIR}/fc-lang)
+list(TRANSFORM ORTH_NAMES PREPEND ${DOT_FCLANG}/ OUTPUT_VARIABLE ORTH_FILES)
+
+add_custom_command(
+  OUTPUT ${DOT_GEN_H}/fclang.h
+  COMMAND ${CMAKE_COMMAND} -E make_directory ${DOT_GEN_H}
+  COMMAND ${Python3_EXECUTABLE} fc-lang.py ${ORTH_NAMES} --template fclang.tmpl.h --output ${DOT_GEN_H}/fclang.h
+  WORKING_DIRECTORY ${DOT_FCLANG}
+  DEPENDS Python3::Interpreter ${DOT_FCLANG}/fc-lang.py ${DOT_FCLANG}/fclang.tmpl.h ${ORTH_FILES}
+)
+###
 
 add_custom_target(dropout_generated_headers DEPENDS
   ${DOT_GEN_H}/fcstdint.h
   ${DOT_FC_H}
   ${DOT_ALIAS_H}
-  ${DOT_GEN_H}/config.h)
-###
+  ${DOT_GEN_H}/config.h
+  ${DOT_GEN_H}/fclang.h)
 
 add_library(fontconfig SHARED
   src/fcinit.c
