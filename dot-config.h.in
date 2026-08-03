@@ -27,4 +27,6 @@
 #define FC_VERSION_MINOR @fontconfig_VERSION_MINOR@
 #define FC_VERSION_MICRO @fontconfig_VERSION_PATCH@
 
+#define FC_GPERF_SIZE_T @GPERF_SIZE_T@
+
 #endif /* DROPOUT_CONFIG_H */

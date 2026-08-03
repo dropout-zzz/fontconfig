@@ -24,6 +24,8 @@ endif()
 set(CACHE{FC_BASECONFIGDIR} HELP "Default base configuration directory" VALUE "${CMAKE_INSTALL_FULL_SYSCONFDIR}/fonts")
 set(CACHE{FC_CONFIGDIR} HELP "Default configuration directory" VALUE "${FC_BASECONFIGDIR}/conf.d")
 
+find_program(GPERF_EXECUTABLE gperf REQUIRED)
+
 # we need for generating headers
 find_package(Python3 COMPONENTS Interpreter REQUIRED)
 
@@ -74,6 +76,35 @@ try_compile(HAVE_STDATOMIC_PRIMITIVES SOURCES ${DOT_TESTS}/stdatomic-primitives-
 try_compile(HAVE_INTEL_ATOMIC_PRIMITIVES SOURCES ${DOT_TESTS}/intel-atomic-primitives-test.c)
 try_compile(HAVE_SOLARIS_ATOMIC_OPS SOURCES ${DOT_TESTS}/solaris-atomic-operations.c)
 
+execute_process(
+  COMMAND ${GPERF_EXECUTABLE} -L ANSI-C
+  INPUT_FILE ${DOT_TESTS}/gperf.txt
+  OUTPUT_VARIABLE GPERF_TEST_SRC
+  COMMAND_ERROR_IS_FATAL ANY
+)
+
+include(CheckCSourceCompiles)
+
+foreach(GPERF_SIZE_T_IT size_t unsigned)
+  check_c_source_compiles("
+    #include <string.h>
+    const char *in_word_set(const char *, ${GPERF_SIZE_T_IT});
+    ${GPERF_TEST_SRC}
+    int main(void) { return 0; }
+  " GPERF_TEST_${GPERF_SIZE_T_IT})
+
+  if(GPERF_TEST_${GPERF_SIZE_T_IT})
+    set(GPERF_SIZE_T ${GPERF_SIZE_T_IT})
+    break()
+  endif()
+endforeach()
+
+if(NOT DEFINED GPERF_SIZE_T)
+  message(FATAL_ERROR "can't determine type of gperf \"len\" parameter")
+endif()
+
+message(STATUS "gperf len type is ${GPERF_SIZE_T}")
+
 ###
 set(DOT_GEN_H ${CMAKE_CURRENT_BINARY_DIR}/dot_gen_h)
 
@@ -85,8 +116,6 @@ endif()
 
 configure_file(dot-config.h.in ${DOT_GEN_H}/config.h)
 ###
-include(CheckCSourceCompiles)
-
 foreach(STDINT_TYPE uint64_t int32_t uintptr_t intptr_t)
   check_c_source_compiles("
     #include <stdint.h>
