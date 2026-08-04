@@ -351,3 +351,5 @@ target_include_directories(fontconfig PRIVATE
 target_link_libraries(fontconfig PRIVATE
   EXPAT::EXPAT
   Freetype::Freetype)
+
+install(TARGETS fontconfig)

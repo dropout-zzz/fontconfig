@@ -32,3 +32,4 @@ test-driver
 /target*
 dot_gen_h/
 dropout/
+install_manifest.txt
