@@ -281,6 +281,15 @@ DOT_FIXUP_SRC(
 
 add_library(fontconfig SHARED
   ${DOT_DIR}/fcstr.c
+  src/fccharset.c
+  src/fclang.c
+  src/fccompat.c
+  src/fcserialize.c
+  src/fcfs.c
+  src/fcxml.c
+  src/fcptrlist.c
+  src/fcrange.c
+  src/fcmatrix.c
   src/fcobjs.c
   src/fcname.c
   src/fcstat.c
