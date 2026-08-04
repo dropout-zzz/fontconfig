@@ -163,10 +163,11 @@ set(DOT_ALIAS_H
   ${DOT_GEN_H}/fcalias.h
   ${DOT_GEN_H}/fcaliastail.h)
 set(DOT_SRC ${CMAKE_CURRENT_SOURCE_DIR}/src)
+set(DOT_FC ${CMAKE_CURRENT_SOURCE_DIR}/fontconfig)
 set(DOT_ALIAS_IN
   ${DOT_FC_H}
   ${DOT_SRC}/fcdeprecate.h
-  ${CMAKE_CURRENT_SOURCE_DIR}/fontconfig/fcprivate.h)
+  ${DOT_FC}/fcprivate.h)
 
 add_custom_command(
   OUTPUT ${DOT_ALIAS_H}
@@ -269,6 +270,18 @@ add_custom_command(
   DEPENDS Python3::Interpreter ${DOT_FCCASE}/fc-case.py ${DOT_FCCASE}/CaseFolding.txt ${DOT_FCCASE}/fccase.tmpl.h
 )
 ###
+set(DOT_FTALIAS_H
+  ${DOT_GEN_H}/fcftalias.h
+  ${DOT_GEN_H}/fcftaliastail.h)
+
+add_custom_command(
+  OUTPUT ${DOT_FTALIAS_H}
+  COMMAND ${CMAKE_COMMAND} -E make_directory ${DOT_GEN_H}
+  COMMAND ${Python3_EXECUTABLE} makealias.py . ${DOT_FTALIAS_H} ${DOT_FC}/fcfreetype.h
+  WORKING_DIRECTORY ${DOT_SRC}
+  DEPENDS Python3::Interpreter ${DOT_SRC}/makealias.py ${DOT_FC}/fcfreetype.h
+)
+###
 
 add_custom_target(dropout_generated_headers DEPENDS
   ${DOT_GEN_H}/fcstdint.h
@@ -278,7 +291,8 @@ add_custom_target(dropout_generated_headers DEPENDS
   ${DOT_GEN_H}/fclang.h
   ${DOT_GEN_H}/fcconst.h
   ${DOT_GEN_H}/fcobjshash.h
-  ${DOT_GEN_H}/fccase.h)
+  ${DOT_GEN_H}/fccase.h
+  ${DOT_FTALIAS_H})
 
 function(DOT_FIXUP_SRC DOT_ID DOT_PATH DOT_NEW DOT_PAT DOT_SUB)
   add_custom_target(prepare_${DOT_ID}_source ALL
