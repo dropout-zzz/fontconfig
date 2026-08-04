@@ -374,6 +374,9 @@ else()
   target_compile_definitions(fontconfig PRIVATE FLEXIBLE_ARRAY_MEMBER=1)
 endif()
 target_compile_definitions(fontconfig PRIVATE -DHAVE_CONFIG_H)
+if(WIN32)
+  target_compile_definitions(fontconfig PRIVATE -DFcPublic=__declspec\(dllexport\))
+endif()
 add_dependencies(fontconfig
   dropout_generated_headers)
 target_include_directories(fontconfig PRIVATE
