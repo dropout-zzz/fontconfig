@@ -30,6 +30,12 @@
 
 #cmakedefine HAVE_USELOCALE 1
 
+#cmakedefine HAVE_RANDOM_R 1
+#cmakedefine HAVE_RANDOM 1
+#cmakedefine HAVE_LRAND48 1
+#cmakedefine HAVE_RAND_R 1
+#cmakedefine HAVE_RAND 1
+
 #define FC_VERSION_MAJOR @fontconfig_VERSION_MAJOR@
 #define FC_VERSION_MINOR @fontconfig_VERSION_MINOR@
 #define FC_VERSION_MICRO @fontconfig_VERSION_PATCH@

@@ -83,6 +83,12 @@ check_symbol_exists(_mktemp_s "io.h" HAVE__MKTEMP_S)
 
 check_symbol_exists(uselocale "locale.h" HAVE_USELOCALE)
 
+check_symbol_exists(random_r "stdlib.h" HAVE_RANDOM_R)
+check_symbol_exists(random "stdlib.h" HAVE_RANDOM)
+check_symbol_exists(lrand48 "stdlib.h" HAVE_LRAND48)
+check_symbol_exists(rand_r "stdlib.h" HAVE_RAND_R)
+check_symbol_exists(rand "stdlib.h" HAVE_RAND)
+
 try_compile(HAVE_STDATOMIC_PRIMITIVES SOURCES ${DOT_TESTS}/stdatomic-primitives-test.c)
 try_compile(HAVE_INTEL_ATOMIC_PRIMITIVES SOURCES ${DOT_TESTS}/intel-atomic-primitives-test.c)
 try_compile(HAVE_SOLARIS_ATOMIC_OPS SOURCES ${DOT_TESTS}/solaris-atomic-operations.c)
