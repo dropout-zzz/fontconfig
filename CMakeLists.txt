@@ -81,6 +81,8 @@ check_symbol_exists(mkostemp "stdlib.h" HAVE_MKOSTEMP)
 check_symbol_exists(mkstemp "stdlib.h" HAVE_MKSTEMP)
 check_symbol_exists(_mktemp_s "io.h" HAVE__MKTEMP_S)
 
+check_symbol_exists(uselocale "locale.h" HAVE_USELOCALE)
+
 try_compile(HAVE_STDATOMIC_PRIMITIVES SOURCES ${DOT_TESTS}/stdatomic-primitives-test.c)
 try_compile(HAVE_INTEL_ATOMIC_PRIMITIVES SOURCES ${DOT_TESTS}/intel-atomic-primitives-test.c)
 try_compile(HAVE_SOLARIS_ATOMIC_OPS SOURCES ${DOT_TESTS}/solaris-atomic-operations.c)

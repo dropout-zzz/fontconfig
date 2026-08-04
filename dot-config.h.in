@@ -28,6 +28,8 @@
 #cmakedefine HAVE_MKSTEMP 1
 #cmakedefine HAVE__MKTEMP_S 1
 
+#cmakedefine HAVE_USELOCALE 1
+
 #define FC_VERSION_MAJOR @fontconfig_VERSION_MAJOR@
 #define FC_VERSION_MINOR @fontconfig_VERSION_MINOR@
 #define FC_VERSION_MICRO @fontconfig_VERSION_PATCH@
