@@ -42,4 +42,6 @@
 
 #define FC_GPERF_SIZE_T @GPERF_SIZE_T@
 
+#define ENABLE_FREETYPE 1
+
 #endif /* DROPOUT_CONFIG_H */
