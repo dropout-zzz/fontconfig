@@ -311,6 +311,8 @@ DOT_FIXUP_SRC(
 )
 
 add_library(fontconfig SHARED
+  src/fcatomic.c
+  src/fcweight.c
   ${DOT_DIR}/fcstr.c
   src/fccharset.c
   src/fclang.c
