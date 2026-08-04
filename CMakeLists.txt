@@ -67,6 +67,7 @@ include(CheckIncludeFile)
 
 check_include_file("unistd.h" HAVE_UNISTD_H)
 check_include_file("dirent.h" HAVE_DIRENT_H)
+check_include_file("fcntl.h" HAVE_FCNTL_H)
 
 include(CheckSymbolExists)
 
