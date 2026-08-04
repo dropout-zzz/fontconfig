@@ -242,6 +242,16 @@ add_custom_command(
   DEPENDS ${GPERF_EXECUTABLE} ${DOT_DIR}/fcobjshash.gperf
 )
 ###
+set(DOT_FCCASE ${CMAKE_CURRENT_SOURCE_DIR}/fc-case)
+
+add_custom_command(
+  OUTPUT ${DOT_GEN_H}/fccase.h
+  COMMAND ${CMAKE_COMMAND} -E make_directory ${DOT_GEN_H}
+  COMMAND ${Python3_EXECUTABLE} fc-case.py CaseFolding.txt --template fccase.tmpl.h --output ${DOT_GEN_H}/fccase.h
+  WORKING_DIRECTORY ${DOT_FCCASE}
+  DEPENDS Python3::Interpreter ${DOT_FCCASE}/fc-case.py ${DOT_FCCASE}/CaseFolding.txt ${DOT_FCCASE}/fccase.tmpl.h
+)
+###
 
 add_custom_target(dropout_generated_headers DEPENDS
   ${DOT_GEN_H}/fcstdint.h
@@ -250,7 +260,8 @@ add_custom_target(dropout_generated_headers DEPENDS
   ${DOT_GEN_H}/config.h
   ${DOT_GEN_H}/fclang.h
   ${DOT_GEN_H}/fcconst.h
-  ${DOT_GEN_H}/fcobjshash.h)
+  ${DOT_GEN_H}/fcobjshash.h
+  ${DOT_GEN_H}/fccase.h)
 
 function(DOT_FIXUP_SRC DOT_ID DOT_PATH DOT_NEW DOT_PAT DOT_SUB)
   add_custom_target(prepare_${DOT_ID}_source ALL
