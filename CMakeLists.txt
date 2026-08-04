@@ -307,6 +307,9 @@ add_library(fontconfig SHARED
   src/fcptrlist.c
   src/fcrange.c
   src/fcmatrix.c
+  src/fchash.c
+  src/fcdir.c
+  src/fclist.c
   src/fcobjs.c
   src/fcname.c
   src/fcstat.c
