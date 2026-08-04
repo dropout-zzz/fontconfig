@@ -33,7 +33,7 @@ find_program(GPERF_EXECUTABLE gperf REQUIRED)
 # we need for generating headers
 find_package(Python3 COMPONENTS Interpreter REQUIRED)
 
-find_package(EXPAT REQUIRED)
+find_package(EXPAT REQUIRED)  # FIXME
 find_package(Freetype REQUIRED)
 
 set(DOT_TESTS ${CMAKE_CURRENT_SOURCE_DIR}/meson-cc-tests)
@@ -62,12 +62,14 @@ function(CHECK_C_TYPE_ALIGN DOT_C_TYPE DOT_RESVAR)
 endfunction()
 
 CHECK_C_TYPE_ALIGN("void *" ALIGNOF_VOID_P)
+# FIXME
 
 include(CheckIncludeFile)
 
 check_include_file("unistd.h" HAVE_UNISTD_H)
 check_include_file("dirent.h" HAVE_DIRENT_H)
 check_include_file("fcntl.h" HAVE_FCNTL_H)
+# FIXME
 
 include(CheckSymbolExists)
 
@@ -89,10 +91,15 @@ check_symbol_exists(lrand48 "stdlib.h" HAVE_LRAND48)
 check_symbol_exists(rand_r "stdlib.h" HAVE_RAND_R)
 check_symbol_exists(rand "stdlib.h" HAVE_RAND)
 
+# FIXME
+
 try_compile(HAVE_STDATOMIC_PRIMITIVES SOURCES ${DOT_TESTS}/stdatomic-primitives-test.c)
 try_compile(HAVE_INTEL_ATOMIC_PRIMITIVES SOURCES ${DOT_TESTS}/intel-atomic-primitives-test.c)
 try_compile(HAVE_SOLARIS_ATOMIC_OPS SOURCES ${DOT_TESTS}/solaris-atomic-operations.c)
 
+# FIXME
+
+###
 execute_process(
   COMMAND ${GPERF_EXECUTABLE} -L ANSI-C
   INPUT_FILE ${DOT_TESTS}/gperf.txt
@@ -121,7 +128,6 @@ if(NOT DEFINED GPERF_SIZE_T)
 endif()
 
 message(STATUS "gperf len type is ${GPERF_SIZE_T}")
-
 ###
 set(DOT_GEN_H ${CMAKE_CURRENT_BINARY_DIR}/dot_gen_h)
 
@@ -355,4 +361,5 @@ target_link_libraries(fontconfig PRIVATE
   EXPAT::EXPAT
   Freetype::Freetype)
 
+# FIXME
 install(TARGETS fontconfig)
