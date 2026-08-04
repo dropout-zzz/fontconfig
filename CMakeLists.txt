@@ -344,7 +344,8 @@ add_dependencies(fontconfig
   dropout_generated_headers)
 target_include_directories(fontconfig PRIVATE
   ${DOT_GEN_H}
-  src)
+  src
+  ${CMAKE_CURRENT_SOURCE_DIR})
 target_link_libraries(fontconfig PRIVATE
   EXPAT::EXPAT
   Freetype::Freetype)
