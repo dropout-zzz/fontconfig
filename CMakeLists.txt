@@ -335,7 +335,10 @@ add_library(fontconfig SHARED
   src/fcdefault.c
   src/fcpat.c
   src/fcmatch.c
-  src/fcdbg.c)
+  src/fcdbg.c
+  src/fcfreetype.c
+  src/fcgenericalias.c
+  src/ftglue.c)
 if(CC_TEST_FAM)
   target_compile_definitions(fontconfig PRIVATE -DFLEXIBLE_ARRAY_MEMBER)
 else()
