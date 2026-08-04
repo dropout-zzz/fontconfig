@@ -4,6 +4,10 @@ project(fontconfig LANGUAGES C VERSION 2.18.2)
 
 set(CMAKE_C_STANDARD 11)
 
+if(NOT MSVC)
+  string(APPEND CMAKE_C_FLAGS " -D_GNU_SOURCE")
+endif()
+
 include(GNUInstallDirs)
 
 if(WIN32)
@@ -71,6 +75,10 @@ check_symbol_exists(_vsnprintf_l "stdio.h" HAVE__VSNPRINTF_L)
 check_symbol_exists(vasprintf "stdio.h;stdarg.h" HAVE_VASPRINTF)
 try_compile(HAVE_C99_VSNPRINTF SOURCES ${DOT_TESTS}/c99-vsnprint-test.c)
 check_symbol_exists(vsnprintf "stdio.h;stdarg.h" HAVE_VSNPRINTF)
+
+check_symbol_exists(mkostemp "stdlib.h" HAVE_MKOSTEMP)
+check_symbol_exists(mkstemp "stdlib.h" HAVE_MKSTEMP)
+check_symbol_exists(_mktemp_s "io.h" HAVE__MKTEMP_S)
 
 try_compile(HAVE_STDATOMIC_PRIMITIVES SOURCES ${DOT_TESTS}/stdatomic-primitives-test.c)
 try_compile(HAVE_INTEL_ATOMIC_PRIMITIVES SOURCES ${DOT_TESTS}/intel-atomic-primitives-test.c)
