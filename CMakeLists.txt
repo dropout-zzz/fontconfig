@@ -288,6 +288,28 @@ add_custom_command(
   DEPENDS Python3::Interpreter ${DOT_SRC}/makealias.py ${DOT_FC}/fcfreetype.h
 )
 ###
+set(FC_FAMILIES
+  serif sans-serif monospace cursive fantasy system-ui ui-serif
+  ui-sans-serif ui-monospace ui-rounded emoji math fangsong)
+list(TRANSFORM FC_FAMILIES APPEND ".txt")
+
+set(DOT_FCFAMILY ${CMAKE_CURRENT_SOURCE_DIR}/fc-genericfamily)
+list(TRANSFORM FC_FAMILIES PREPEND ${DOT_FCFAMILY}/)
+
+add_custom_command(
+  OUTPUT ${DOT_DIR}/fcgenericfamily.gperf
+  COMMAND ${Python3_EXECUTABLE} fc-genericfamily.py -o ${DOT_DIR}/fcgenericfamily.gperf
+  WORKING_DIRECTORY ${DOT_FCFAMILY}
+  DEPENDS Python3::Interpreter ${DOT_FCFAMILY}/fc-genericfamily.py ${FC_FAMILIES} dropout_dir
+)
+
+add_custom_command(
+  OUTPUT ${DOT_GEN_H}/fcgenericfamily.h
+  COMMAND ${CMAKE_COMMAND} -E make_directory ${DOT_GEN_H}
+  COMMAND ${GPERF_EXECUTABLE} --pic -m 100 ${DOT_DIR}/fcgenericfamily.gperf --output-file ${DOT_GEN_H}/fcgenericfamily.h
+  DEPENDS ${GPERF_EXECUTABLE} ${DOT_DIR}/fcgenericfamily.gperf
+)
+###
 
 add_custom_target(dropout_generated_headers DEPENDS
   ${DOT_GEN_H}/fcstdint.h
@@ -298,7 +320,8 @@ add_custom_target(dropout_generated_headers DEPENDS
   ${DOT_GEN_H}/fcconst.h
   ${DOT_GEN_H}/fcobjshash.h
   ${DOT_GEN_H}/fccase.h
-  ${DOT_FTALIAS_H})
+  ${DOT_FTALIAS_H}
+  ${DOT_GEN_H}/fcgenericfamily.h)
 
 function(DOT_FIXUP_SRC DOT_ID DOT_PATH DOT_NEW DOT_PAT DOT_SUB)
   add_custom_target(prepare_${DOT_ID}_source ALL
