@@ -425,5 +425,13 @@ endif()
 target_link_libraries(fontconfig PRIVATE
   Freetype::Freetype)
 
+set_target_properties(fontconfig PROPERTIES
+  PUBLIC_HEADER "${DOT_FC_H};fontconfig/fcfreetype.h"
+  PRIVATE_HEADER fontconfig/fcprivate.h)
+
 # FIXME
-install(TARGETS fontconfig)
+install(
+  TARGETS fontconfig
+  PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/${PROJECT_NAME}
+  PRIVATE_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/${PROJECT_NAME}
+)
