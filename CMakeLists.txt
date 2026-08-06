@@ -42,7 +42,30 @@ try_compile(CC_TEST_FAM SOURCES ${DOT_TESTS}/flexible-array-member-test.c)
 include(CheckTypeSize)
 check_type_size("void *" SIZEOF_VOID_P BUILTIN_TYPES_ONLY)
 
+include(CheckCSourceCompiles)
+
 function(CHECK_C_TYPE_ALIGN DOT_C_TYPE DOT_RESVAR)
+  if(CMAKE_CROSSCOMPILING AND NOT CMAKE_CROSSCOMPILING_EMULATOR)
+    # the trick is mostly copied intact from what meson and autoconf does
+    # except this version guesses only a few common numbers
+    foreach(DOT_GUESS 1 2 4 8 16)
+      check_c_source_compiles("
+        #include <stddef.h>
+        typedef struct { char x; ${DOT_C_TYPE} y; } foo;
+        int main(void) {
+          static int dummy[1 - 2 * !(offsetof(foo, y) == ${DOT_GUESS})];
+          dummy[0] = 0;
+          return 0;
+        }
+      " GUESS_${DOT_RESVAR}_${DOT_GUESS})
+
+      if(GUESS_${DOT_RESVAR}_${DOT_GUESS})
+        set(${DOT_RESVAR} ${DOT_GUESS} PARENT_SCOPE)
+        return()
+      endif()
+    endforeach()
+  endif()
+
   try_run(${DOT_RESVAR}_CC_TEST ${DOT_RESVAR}_CC_COMPILES SOURCE_FROM_CONTENT cc-test.c "
     #include <stddef.h>
     #include <stdio.h>
@@ -106,8 +129,6 @@ execute_process(
   OUTPUT_VARIABLE GPERF_TEST_SRC
   COMMAND_ERROR_IS_FATAL ANY
 )
-
-include(CheckCSourceCompiles)
 
 foreach(GPERF_SIZE_T_IT size_t unsigned)
   check_c_source_compiles("
