@@ -28,12 +28,19 @@ endif()
 set(CACHE{FC_BASECONFIGDIR} HELP "Default base configuration directory" VALUE "${CMAKE_INSTALL_FULL_SYSCONFDIR}/fonts")
 set(CACHE{FC_CONFIGDIR} HELP "Default configuration directory" VALUE "${FC_BASECONFIGDIR}/conf.d")
 
+option(FONTCONFIG_PREFER_LIBXML2 "Try to use libxml2 as parser backend when possible" OFF)
+
 find_program(GPERF_EXECUTABLE gperf REQUIRED)
 
 # we need for generating headers
 find_package(Python3 COMPONENTS Interpreter REQUIRED)
 
-find_package(EXPAT REQUIRED)  # FIXME
+find_package(EXPAT)
+find_package(LibXml2)
+if(NOT EXPAT_FOUND AND NOT LibXml2_FOUND)
+  message(FATAL_ERROR "No available XML parser backend found.")
+endif()
+
 find_package(Freetype REQUIRED)
 
 set(DOT_TESTS ${CMAKE_CURRENT_SOURCE_DIR}/meson-cc-tests)
@@ -156,6 +163,12 @@ list(JOIN DFLT_FONT_DIRS "</dir> <dir>" FC_DEFAULT_FONTS)
 if(NOT FC_DEFAULT_FONTS STREQUAL "")
   string(PREPEND FC_DEFAULT_FONTS "<dir>")
   string(APPEND FC_DEFAULT_FONTS "</dir>")
+endif()
+
+if((LibXml2_FOUND AND FONTCONFIG_PREFER_LIBXML2) OR NOT EXPAT_FOUND)
+  set(ENABLE_LIBXML2 TRUE)
+else()
+  set(ENABLE_LIBXML2 FALSE)
 endif()
 
 configure_file(dot-config.h.in ${DOT_GEN_H}/config.h)
@@ -404,8 +417,12 @@ target_include_directories(fontconfig PRIVATE
   ${DOT_GEN_H}
   src
   ${CMAKE_CURRENT_SOURCE_DIR})
+if(ENABLE_LIBXML2)
+  target_link_libraries(fontconfig PRIVATE LibXml2::LibXml2)
+else()
+  target_link_libraries(fontconfig PRIVATE EXPAT::EXPAT)
+endif()
 target_link_libraries(fontconfig PRIVATE
-  EXPAT::EXPAT
   Freetype::Freetype)
 
 # FIXME
